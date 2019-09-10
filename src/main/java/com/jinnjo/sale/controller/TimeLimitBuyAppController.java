@@ -19,7 +19,7 @@ import java.util.Optional;
  * @date 2019\9\10 0010 14:21
  * description:
  */
-@Api(tags = "限时购活动")
+@Api(tags = "限时购活动APP")
 @Slf4j
 @RestController
 @RequestMapping(value = "/time-buy/app")
@@ -31,7 +31,7 @@ public class TimeLimitBuyAppController {
     }
 
     @ApiOperation(value = "首页限时购", notes = "首页限时购")
-    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<List<TimeLimitBuy>> getForTop(){
         return Optional.of(timeLimitBuyAppService.getForTop()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
