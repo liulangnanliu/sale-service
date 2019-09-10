@@ -28,9 +28,4 @@ public class SeckillGoodsVo {
     @ApiModelProperty(value = "秒杀价格")
     public BigDecimal seckillPrice;
 
-    @ApiModelProperty(value = "活动标识")
-    public String activityId;
-
-    @ApiModelProperty(value = "虚拟销量")
-    public BigDecimal virtualSales;
 }
