@@ -1,6 +1,7 @@
 package com.jinnjo.sale.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jinnjo.sale.domain.vo.TimeLimitBuyVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "jz_time_limit_buy")
-@ApiModel(value="timeLimitBuy",description="限时购活动(status:1 启用,0 不启用)")
+@ApiModel(value="timeLimitBuy",description="限时购商品活动(status:1 启用,0 不启用)")
 public class TimeLimitBuy extends BaseEntity{
     @ApiModelProperty(value = "商品ID", name = "goodId")
     @Column(name = "good_id",columnDefinition="bigint(20) NOT NULL COMMENT '商品ID'")
@@ -75,4 +76,17 @@ public class TimeLimitBuy extends BaseEntity{
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date saleTime;
+
+    public TimeLimitBuy(){
+
+    }
+
+    public TimeLimitBuy(Date saleTime, TimeLimitBuyVo.TimeLimitBuyGoodVo timeLimitBuyGoodVo){
+        this.saleTime = saleTime;
+        this.goodId = timeLimitBuyGoodVo.getGoodId();
+        this.goodName = timeLimitBuyGoodVo.getGoodName();
+        this.goodImg = timeLimitBuyGoodVo.getGoodImg();
+        this.buyType = timeLimitBuyGoodVo.getPreBuyType();
+
+    }
 }

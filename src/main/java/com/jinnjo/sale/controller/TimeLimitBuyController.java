@@ -13,14 +13,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
-@Api(tags = "限时购活动")
+@Api(tags = "限时购商品活动")
 @Slf4j
 @RestController
+@RequestMapping("time-limit")
 public class TimeLimitBuyController {
     private final TimeLimitBuyService timeLimitBuyService;
 
@@ -31,7 +34,7 @@ public class TimeLimitBuyController {
 
     @ApiOperation(value = "添加限时购", notes = "添加限时购")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<TimeLimitBuy> addNote(@Valid @RequestBody @ApiParam(name = "timeLimitBuyVo",value = "新增限时购对象")TimeLimitBuyVo timeLimitBuyVo){
+    public ResponseEntity<List<TimeLimitBuy>> addTimeLimitBuy(@Valid @RequestBody @ApiParam(name = "timeLimitBuyVo",value = "新增限时购对象")TimeLimitBuyVo timeLimitBuyVo){
         log.info("添加限时购接收参数timeLimitBuyVo{}", timeLimitBuyVo);
         return Optional.of(timeLimitBuyService.add(timeLimitBuyVo)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }

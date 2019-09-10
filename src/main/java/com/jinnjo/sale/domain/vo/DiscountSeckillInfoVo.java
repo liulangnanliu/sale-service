@@ -17,16 +17,22 @@ public class DiscountSeckillInfoVo {
     public Boolean isSwitch = false;
 
     @ApiModelProperty(value = "秒杀开始时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date startSeckillTime;
 
     @ApiModelProperty(value = "秒杀结束时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date endSeckillTime;
 
     @ApiModelProperty(value = "秒杀商品列表")
     public List<SeckillGoodsVo> seckillGoodsList;
+
+    public DiscountSeckillInfoVo(Date startSeckillTime, Date endSeckillTime, List<SeckillGoodsVo> seckillGoodsList){
+        this.startSeckillTime = startSeckillTime;
+        this.endSeckillTime = endSeckillTime;
+        this.seckillGoodsList = seckillGoodsList;
+    }
 
 }

@@ -28,4 +28,14 @@ public class SeckillGoodsVo {
     @ApiModelProperty(value = "秒杀价格")
     public BigDecimal seckillPrice;
 
+    public SeckillGoodsVo(TimeLimitBuyVo.TimeLimitBuyGoodVo goodVo){
+        this.goodsId = String.valueOf(goodVo.getGoodId());
+        this.goodsName = goodVo.getGoodName();
+        this.goodsSpecId = String.valueOf(goodVo.getSkuId());
+        this.goodsSpecName = goodVo.getSkuName();
+        this.totalCount = goodVo.getStock();
+        this.limitCount = goodVo.getLimitNum();
+        this.seckillPrice = goodVo.getDiscountPrice();
+    }
+
 }
