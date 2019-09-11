@@ -3,11 +3,9 @@ package com.jinnjo.sale.clients;
 import com.jinnjo.base.feign.FeignSecurityBean;
 import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Component
 @FeignClient(name="campaignClient", url="${sale.mcs.service.url}")
@@ -17,5 +15,5 @@ public interface CampaignCilent {
     String addCampaigns(@RequestBody MarketingCampaignVo marketingCampaignVo);
 
     @GetMapping(value = "/campaigns/seckills", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
-    String getCampaignsByPage(@Param("date") String date);
+    String getCampaignsByPage(@RequestParam("date") String date);
 }

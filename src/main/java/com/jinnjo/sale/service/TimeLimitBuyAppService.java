@@ -1,8 +1,9 @@
 package com.jinnjo.sale.service;
 
-import com.jinnjo.sale.domain.TimeLimitBuy;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
+
 
 /**
  * @author bobo
@@ -10,5 +11,6 @@ import java.util.List;
  * description:
  */
 public interface TimeLimitBuyAppService {
-    List<TimeLimitBuy> getForTop();
+    JSONObject getForTop();
+    List<JSONObject> getForList();
 }
