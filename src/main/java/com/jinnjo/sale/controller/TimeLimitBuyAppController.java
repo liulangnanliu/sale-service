@@ -32,12 +32,12 @@ public class TimeLimitBuyAppController {
     @ApiOperation(value = "首页限时购", notes = "首页限时购")
     @GetMapping(value = "/top",produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<JSONObject> getForTop(){
-        return Optional.of(timeLimitBuyAppService.getForTop()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return Optional.ofNullable(timeLimitBuyAppService.getForTop()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "限时购列表", notes = "限时购列表")
     @GetMapping(value = "/list",produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<List<JSONObject>> getForList(){
-        return Optional.of(timeLimitBuyAppService.getForList()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<Object>> getForList(){
+        return Optional.ofNullable(timeLimitBuyAppService.getForList()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 }

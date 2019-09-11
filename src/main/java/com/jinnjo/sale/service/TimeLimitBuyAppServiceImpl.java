@@ -68,7 +68,9 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     }
 
     @Override
-    public List<JSONObject> getForList() {
-        return null;
+    public List<Object> getForList() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = simpleDateFormat.format(new Date());
+        return JSONArray.parseArray(campaignCilent.getCampaignsByPage("2019-09-10"));
     }
 }

@@ -12,5 +12,5 @@ import java.util.List;
  */
 public interface TimeLimitBuyAppService {
     JSONObject getForTop();
-    List<JSONObject> getForList();
+    List<Object> getForList();
 }
