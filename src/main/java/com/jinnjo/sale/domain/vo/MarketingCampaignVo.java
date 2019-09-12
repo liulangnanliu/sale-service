@@ -13,13 +13,13 @@ public class MarketingCampaignVo {
     public String name;
 
     @ApiModelProperty(value = "营销活动开始时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public Date startTime;
 
     @ApiModelProperty(value = "营销活动结束时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public Date endTime;
 
     @ApiModelProperty(value = "使用位置 1 全部 2 App  3  小程序")
@@ -30,6 +30,9 @@ public class MarketingCampaignVo {
 
     @ApiModelProperty(value = "秒杀优惠信息对象")
     public DiscountSeckillInfoVo discountSeckillInfoVo;
+
+    @ApiModelProperty(value = "距离开始时间")
+    public Long interval;
 
     public MarketingCampaignVo(){
 

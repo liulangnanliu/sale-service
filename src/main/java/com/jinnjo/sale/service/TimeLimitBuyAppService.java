@@ -1,6 +1,6 @@
 package com.jinnjo.sale.service;
 
-import com.alibaba.fastjson.JSONObject;
+import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 
 import java.util.List;
 
@@ -11,6 +11,6 @@ import java.util.List;
  * description:
  */
 public interface TimeLimitBuyAppService {
-    JSONObject getForTop();
-    List<Object> getForList();
+    MarketingCampaignVo getForTop();
+    List<MarketingCampaignVo> getForList();
 }

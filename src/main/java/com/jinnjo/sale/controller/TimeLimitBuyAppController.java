@@ -1,6 +1,6 @@
 package com.jinnjo.sale.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 import com.jinnjo.sale.service.TimeLimitBuyAppService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,13 +31,13 @@ public class TimeLimitBuyAppController {
 
     @ApiOperation(value = "首页限时购", notes = "首页限时购")
     @GetMapping(value = "/top",produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<JSONObject> getForTop(){
+    public ResponseEntity<MarketingCampaignVo> getForTop(){
         return Optional.ofNullable(timeLimitBuyAppService.getForTop()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "限时购列表", notes = "限时购列表")
     @GetMapping(value = "/list",produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<List<Object>> getForList(){
+    public ResponseEntity<List<MarketingCampaignVo>> getForList(){
         return Optional.ofNullable(timeLimitBuyAppService.getForList()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 }
