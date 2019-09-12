@@ -32,11 +32,4 @@ public class DiscountSeckillInfoVo {
     public DiscountSeckillInfoVo(){
 
     }
-
-    public DiscountSeckillInfoVo(Date startSeckillTime, Date endSeckillTime, List<SeckillGoodsVo> seckillGoodsList){
-        this.startSeckillTime = startSeckillTime;
-        this.endSeckillTime = endSeckillTime;
-        this.seckillGoodsList = seckillGoodsList;
-    }
-
 }

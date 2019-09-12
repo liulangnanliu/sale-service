@@ -34,15 +34,10 @@ public class MarketingCampaignVo {
     @ApiModelProperty(value = "距离开始时间")
     public Long interval;
 
-    public MarketingCampaignVo(){
+    @ApiModelProperty(value = "优惠券类型 (1 店铺券 2 平台券)")
+    private Integer discountsType;
 
-    }
+    @ApiModelProperty(value = "活动状态")
+    private Integer status;
 
-
-    public MarketingCampaignVo(String name, Date startTime, Date endTime, DiscountSeckillInfoVo discountSeckillInfoVo){
-        this.name = name;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.discountSeckillInfoVo = discountSeckillInfoVo;
-    }
 }
