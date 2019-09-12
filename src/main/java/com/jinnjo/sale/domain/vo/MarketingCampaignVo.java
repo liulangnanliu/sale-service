@@ -31,6 +31,11 @@ public class MarketingCampaignVo {
     @ApiModelProperty(value = "秒杀优惠信息对象")
     public DiscountSeckillInfoVo discountSeckillInfoVo;
 
+    public MarketingCampaignVo(){
+
+    }
+
+
     public MarketingCampaignVo(String name, Date startTime, Date endTime, DiscountSeckillInfoVo discountSeckillInfoVo){
         this.name = name;
         this.startTime = startTime;

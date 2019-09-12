@@ -6,6 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @Component
 @FeignClient(name="campaignClient", url="${sale.mcs.service.url}")
@@ -15,5 +17,5 @@ public interface CampaignCilent {
     String addCampaigns(@RequestBody MarketingCampaignVo marketingCampaignVo);
 
     @GetMapping(value = "/campaigns/seckills", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
-    String getCampaignsByPage(@RequestParam("date") String date);
+    List<MarketingCampaignVo> getCampaignsByPage(@RequestParam("date") String date);
 }

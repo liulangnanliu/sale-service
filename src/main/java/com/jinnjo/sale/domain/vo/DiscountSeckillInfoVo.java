@@ -29,6 +29,10 @@ public class DiscountSeckillInfoVo {
     @ApiModelProperty(value = "秒杀商品列表")
     public List<SeckillGoodsVo> seckillGoodsList;
 
+    public DiscountSeckillInfoVo(){
+
+    }
+
     public DiscountSeckillInfoVo(Date startSeckillTime, Date endSeckillTime, List<SeckillGoodsVo> seckillGoodsList){
         this.startSeckillTime = startSeckillTime;
         this.endSeckillTime = endSeckillTime;

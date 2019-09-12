@@ -13,6 +13,9 @@ public class SeckillGoodsVo {
     @ApiModelProperty(value = "商品名称")
     public String goodsName;
 
+    @ApiModelProperty(value = "商品图片")
+    private String goodsImg;
+
     @ApiModelProperty(value = "商品规格id")
     public String goodsSpecId;
 
@@ -27,6 +30,10 @@ public class SeckillGoodsVo {
 
     @ApiModelProperty(value = "秒杀价格")
     public BigDecimal seckillPrice;
+
+    public SeckillGoodsVo(){
+
+    }
 
     public SeckillGoodsVo(TimeLimitBuyVo.TimeLimitBuyGoodVo goodVo){
         this.goodsId = String.valueOf(goodVo.getGoodId());

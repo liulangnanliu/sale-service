@@ -34,9 +34,9 @@ public class TimeLimitBuyController {
 
     @ApiOperation(value = "添加限时购", notes = "添加限时购")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<TimeLimitBuy>> addTimeLimitBuy(@Valid @RequestBody @ApiParam(name = "timeLimitBuyVo",value = "新增限时购对象")TimeLimitBuyVo timeLimitBuyVo){
+    public void addTimeLimitBuy(@Valid @RequestBody @ApiParam(name = "timeLimitBuyVo",value = "新增限时购对象")TimeLimitBuyVo timeLimitBuyVo){
         log.info("添加限时购接收参数timeLimitBuyVo{}", timeLimitBuyVo);
-        return Optional.of(timeLimitBuyService.add(timeLimitBuyVo)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        timeLimitBuyService.add(timeLimitBuyVo);
     }
 
 }
