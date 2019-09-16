@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -30,9 +27,16 @@ public class TimeLimitBuyController {
 
     @ApiOperation(value = "添加限时购", notes = "添加限时购")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public void addTimeLimitBuy(@Valid @RequestBody @ApiParam(name = "timeLimitBuyVo",value = "新增限时购对象")MarketingCampaignVo marketingCampaignVo){
+    public void addTimeLimitBuy(@Valid @RequestBody @ApiParam(name = "marketingCampaignVo",value = "新增限时购对象")MarketingCampaignVo marketingCampaignVo){
         log.info("添加限时购接收参数marketingCampaignVo{}", marketingCampaignVo);
         timeLimitBuyService.add(marketingCampaignVo);
     }
 
+
+    @ApiOperation(value = "修改限时购", notes = "修改限时购")
+    @PutMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public void updateTimeLimitBuy(@Valid @RequestBody @ApiParam(name = "marketingCampaignVo",value = "修改限时购对象")MarketingCampaignVo marketingCampaignVo){
+        log.info("修改限时购接收参数marketingCampaignVo{}", marketingCampaignVo);
+        timeLimitBuyService.update(marketingCampaignVo);
+    }
 }

@@ -8,26 +8,26 @@ import java.math.BigDecimal;
 @Data
 public class SeckillGoodsVo {
     @ApiModelProperty(value = "商品编号")
-    public String goodsId;
+    private String goodsId;
 
     @ApiModelProperty(value = "商品名称")
-    public String goodsName;
+    private String goodsName;
 
     @ApiModelProperty(value = "商品图片")
     private String goodsImg;
 
     @ApiModelProperty(value = "商品规格id")
-    public String goodsSpecId;
+    private String goodsSpecId;
 
     @ApiModelProperty(value = "规格名称")
-    public String goodsSpecName;
+    private String goodsSpecName;
 
     @ApiModelProperty(value = "发行量")
-    public Integer totalCount;
+    private Integer totalCount;
 
     @ApiModelProperty(value = "每人限领张数")
-    public Integer limitCount;
+    private Integer limitCount;
 
     @ApiModelProperty(value = "秒杀价格")
-    public BigDecimal seckillPrice;
+    private BigDecimal seckillPrice;
 }
