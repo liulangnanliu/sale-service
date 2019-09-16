@@ -9,6 +9,42 @@ image:
 
 # define environment variables here as a map of key: value
 env:
+  - name: TZ
+    value: Asia/Shanghai
+  - name: LANG
+    value: zh_CN.UTF-8
+  - name: LANGUAGE
+    value: zh_CN:zh
+  - name: SPRING_PROFILES_ACTIVE
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key: env.profile
+  - name: ENCRYPTOR_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key:  encryptor.password
+  - name: ENCRYPTOR_ALGORITHM
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key: encryptor.algorithm
+  - name: CERT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: cascert
+        key: password
+  - name: NACOS_CONFIG_NAMESPACE
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key:  nacos.config.namespace
+  - name: NACOS_CONFIG_SERVER_ADDR
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key:  nacos.config.server-addr
 
 # enable this flag to use knative serve to deploy the app
 knativeDeploy: false
