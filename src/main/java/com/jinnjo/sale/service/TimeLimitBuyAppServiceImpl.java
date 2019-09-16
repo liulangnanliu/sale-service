@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,26 +30,28 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     public MarketingCampaignVo getForTop() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
-        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage("2019-09-10");
+        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date);
         if (marketingCampaignVoList.size()<=0){
             return null;
         }
         List<MarketingCampaignVo> marketingCampaignVoArrayList = new ArrayList<>();
         for (MarketingCampaignVo marketingCampaignVo:marketingCampaignVoList){
-            DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfoVo();
-            Date startTime = discountSeckillInfoVo.getStartSeckillTime();
-            Date endTime = discountSeckillInfoVo.getEndSeckillTime();
-            Date nowTime = new Date();
-            if (startTime.before(nowTime)&&endTime.after(nowTime)){
-                //当前时间在活动时间段内
-                return marketingCampaignVo;
-            }
-            if (endTime.after(nowTime)){
-                Long start = startTime.getTime();
-                Long now = nowTime.getTime();
-                Long interval = start - now;
-                marketingCampaignVo.setInterval(interval);
-                marketingCampaignVoArrayList.add(marketingCampaignVo);
+            DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfo();
+            if (null!=discountSeckillInfoVo){
+                Date startTime = discountSeckillInfoVo.getStartSeckillTime();
+                Date endTime = discountSeckillInfoVo.getEndSeckillTime();
+                Date nowTime = new Date();
+                if (startTime.before(nowTime)&&endTime.after(nowTime)){
+                    //当前时间在活动时间段内
+                    return marketingCampaignVo;
+                }
+                if (endTime.after(nowTime)){
+                    Long start = startTime.getTime();
+                    Long now = nowTime.getTime();
+                    Long interval = start - now;
+                    marketingCampaignVo.setInterval(interval);
+                    marketingCampaignVoArrayList.add(marketingCampaignVo);
+                }
             }
         }
         return marketingCampaignVoArrayList.stream().min(Comparator.comparing(MarketingCampaignVo::getInterval)).orElse(null);
@@ -58,6 +61,6 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     public List<MarketingCampaignVo> getForList() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
-        return campaignCilent.getCampaignsByPage(date);
+        return campaignCilent.getCampaignsByPage("2019-09-10");
     }
 }

@@ -36,10 +36,10 @@ public class TimeLimitBuyService {
 
         List<MarketingCampaignVo> campaignsByPages = campaignCilent.getCampaignsByPage("2019-09-10");//LocalDate.now().toString()
 
-        List<String> goodIds = campaignsByPages.stream().map(marketingCampaignVo -> marketingCampaignVo.discountSeckillInfoVo).flatMap(discountSeckillInfoVo -> discountSeckillInfoVo.getSeckillGoodsList().stream()).map(seckillGoodsVo -> seckillGoodsVo.goodsSpecId).collect(Collectors.toList());
+        List<String> goodIds = campaignsByPages.stream().map(marketingCampaignVo -> marketingCampaignVo.discountSeckillInfo).flatMap(discountSeckillInfoVo -> discountSeckillInfoVo.getSeckillGoodsList().stream()).map(seckillGoodsVo -> seckillGoodsVo.goodsSpecId).collect(Collectors.toList());
 
         campaignsByPages.forEach(marketingCampaignVo -> {
-            DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.discountSeckillInfoVo;
+            DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.discountSeckillInfo;
             if(null == discountSeckillInfoVo)
                 return;
 

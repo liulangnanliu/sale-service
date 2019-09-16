@@ -29,7 +29,7 @@ public class MarketingCampaignVo {
     public Integer applyPlatform = 101;
 
     @ApiModelProperty(value = "秒杀优惠信息对象")
-    public DiscountSeckillInfoVo discountSeckillInfoVo;
+    public DiscountSeckillInfoVo discountSeckillInfo;
 
     @ApiModelProperty(value = "距离开始时间")
     public Long interval;
@@ -40,4 +40,11 @@ public class MarketingCampaignVo {
     @ApiModelProperty(value = "活动状态")
     private Integer status;
 
+
+    public MarketingCampaignVo(String name, Date startTime, Date endTime, DiscountSeckillInfoVo discountSeckillInfo){
+        this.name = name;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.discountSeckillInfo = discountSeckillInfo;
+    }
 }
