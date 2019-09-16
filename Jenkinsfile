@@ -2,6 +2,11 @@ pipeline {
   agent {
     label "jenkins-maven"
   }
+  options {
+        disableConcurrentBuilds()
+        // Add a  gitlab connection in Jenkins > Manage Jenkins > Configure System > Gitlab and name it 'gitlab'
+        gitLabConnection('gitlab')
+    }
   environment {
     ORG = 'jinnjo'
     APP_NAME = 'sale-service'
@@ -9,38 +14,15 @@ pipeline {
     DOCKER_REGISTRY_ORG = 'jinnjo'
   }
   stages {
-    stage('CI Build and push snapshot') {
-      when {
-        branch 'PR-*'
-      }
-      environment {
-        PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
-        PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
-        HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
-      }
-      steps {
-        container('maven') {
-          sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-          sh "mvn install"
-          sh "skaffold version"
-          sh "export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml"
-          sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
-          dir('charts/preview') {
-            sh "make preview"
-            sh "jx preview --app $APP_NAME --dir ../.."
-          }
-        }
-      }
-    }
     stage('Build Release') {
       when {
-        branch 'master'
+        anyOf { branch 'develop*';  branch 'develop'; branch 'master'; branch 'feature*' }
       }
       steps {
         container('maven') {
 
           // ensure we're not on a detached head
-          sh "git checkout master"
+          sh "git checkout $BRANCH_NAME"
           sh "git config --global credential.helper store"
           sh "jx step git credentials"
 
@@ -55,26 +37,80 @@ pipeline {
         }
       }
     }
-    stage('Promote to Environments') {
+    stage('Promote to PROD-Environments') {
       when {
         branch 'master'
       }
       steps {
         container('maven') {
           dir('charts/sale-service') {
-            sh "jx step changelog --version v\$(cat ../../VERSION)"
+            sh "docker tag $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat ../../VERSION) registry.cn-hangzhou.aliyuncs.com/jinnjo/$APP_NAME:\$(cat ../../VERSION)"
+            sh "docker push registry.cn-hangzhou.aliyuncs.com/jinnjo/$APP_NAME:\$(cat ../../VERSION)"
+            sh "echo registry.cn-hangzhou.aliyuncs.com/jinnjo/$APP_NAME:\$(cat ../../VERSION)"
+            //sh "jx step changelog --version v\$(cat ../../VERSION)"
 
+            // release the helm chart
+            // sh "helm init --client-only --stable-repo-url=http://chartmuseum.jx.shequren.cn"
+            // sh "jx step helm release"
+
+            // promote through all 'Auto' promotion Environments
+            // sh "jx promote -b --all-auto --no-wait --timeout 1h --version \$(cat ../../VERSION)"
+          }
+        }
+      }
+    }
+    stage('Promote to Staging-Environments') {
+      when {
+        anyOf { branch 'develop'; branch 'develop*'}
+      }
+      steps {
+        container('maven') {
+          dir('charts/sale-service') {
+            sh "jx step changelog --version v\$(cat ../../VERSION)"
+            sh "helm init --client-only --stable-repo-url=http://chartmuseum.jx.shequren.cn"
+            // release the helm chart
+            //sh "jx step helm release"
+
+            // promote through all 'Auto' promotion Environments
+            //sh "jx promote -b --no-wait --env staging --timeout 1h --version \$(cat ../../VERSION)"
+            sh "helm package ."
+            sh "helm plugin install https://gitlab.shequren.cn/jinnjo/helm-push"
+            sh "helm push -u $CHARTMUSEUM_CREDS_USR -p $CHARTMUSEUM_CREDS_PSW *.tgz http://chartmuseum.jx.shequren.cn"
+            sh "helm repo add jinnjohelm http://chartmuseum.jx.shequren.cn"
+            sh "helm repo list"
+            sh "helm repo update"
+            sh "helm search $APP_NAME"
+            sh "helm upgrade -i $APP_NAME --namespace jx-staging jinnjohelm/$APP_NAME --version \$(cat ../../VERSION)"
+          }
+        }
+      }
+    }
+    stage('Promote to Testing-Environments') {
+      when {
+        anyOf { branch 'feature'; branch 'feature*' }
+      }
+      steps {
+        container('maven') {
+          dir('charts/sale-service') {
+            sh "jx step changelog --version v\$(cat ../../VERSION)"
+            sh "helm init --client-only --stable-repo-url=http://chartmuseum.jx.shequren.cn"
             // release the helm chart
             sh "jx step helm release"
 
             // promote through all 'Auto' promotion Environments
-            sh "jx promote -b --all-auto --timeout 1h --version \$(cat ../../VERSION)"
+            sh "jx promote -b --all-auto --no-wait --timeout 1h --version \$(cat ../../VERSION)"
           }
         }
       }
     }
   }
   post {
+        failure {
+          updateGitlabCommitStatus name: "build${env.BUILD_NUMBER}", state: 'failed'
+        }
+        success {
+          updateGitlabCommitStatus name: "build${env.BUILD_NUMBER}", state: 'success'
+        }
         always {
           cleanWs()
         }
