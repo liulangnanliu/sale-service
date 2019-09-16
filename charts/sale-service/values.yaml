@@ -9,7 +9,33 @@ image:
 
 # define environment variables here as a map of key: value
 env:
-  
+  - name: TZ
+    value: Asia/Shanghai
+  - name: LANG
+    value: zh_CN.UTF-8
+  - name: LANGUAGE
+    value: zh_CN:zh
+  - name: SPRING_PROFILES_ACTIVE
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key: env.profile
+  - name: ENCRYPTOR_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key:  encryptor.password
+  - name: ENCRYPTOR_ALGORITHM
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key: encryptor.algorithm
+  - name: CERT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: cascert
+        key: password
+
 # enable this flag to use knative serve to deploy the app
 knativeDeploy: false
 
@@ -19,7 +45,7 @@ service:
   externalPort: 8018
   internalPort: 8018
   annotations:
-    fabric8.io/expose: "true"
+    fabric8.io/expose: "false"
     fabric8.io/ingress.annotations: "kubernetes.io/ingress.class: nginx"
 resources:
   limits:
@@ -29,11 +55,11 @@ resources:
 probePath: /sale/actuator/health
 livenessProbe:
   initialDelaySeconds: 120
-  periodSeconds: 10
+  periodSeconds: 30
   successThreshold: 1
-  timeoutSeconds: 1
+  timeoutSeconds: 10
 readinessProbe:
   initialDelaySeconds: 120
-  periodSeconds: 10
+  periodSeconds: 30
   successThreshold: 1
-  timeoutSeconds: 1
+  timeoutSeconds: 10
