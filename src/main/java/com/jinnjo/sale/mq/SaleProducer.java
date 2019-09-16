@@ -1,0 +1,34 @@
+package com.jinnjo.sale.mq;
+
+
+
+import com.jinnjo.sale.domain.vo.GoodsMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+
+@Component
+@Slf4j
+public class SaleProducer {
+
+    private final SaleChannels saleChannels;
+
+    @Autowired
+    public SaleProducer(SaleChannels saleChannels){
+        this.saleChannels = saleChannels;
+    }
+
+
+    public void produceSend(List<GoodsMessage> goodsMessageList, String routingKey){
+        log.info("通知短信微服务发送:");
+        saleChannels.output().send(MessageBuilder.withPayload(goodsMessageList).setHeader("routing-key",routingKey).build());
+    }
+
+
+
+
+}
