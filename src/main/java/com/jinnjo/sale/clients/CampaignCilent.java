@@ -21,9 +21,9 @@ public interface CampaignCilent {
     List<MarketingCampaignVo> getCampaignsByPage(@RequestParam("date") String date);
 
     @GetMapping(value = "/campaigns/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
-    MarketingCampaignVo getCampaignById(@PathVariable String id);
+    MarketingCampaignVo getCampaignById(@PathVariable("id") String id);
 
     @GetMapping(value = "/campaigns/testgoods", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
-    List<SeckillGoodsVo> getGoodsListBySeckTime(String startSeckillTime, String endSeckillTime);
+    List<SeckillGoodsVo> getGoodsListBySeckTime(@RequestParam("startSeckillTime")String startSeckillTime,@RequestParam("endSeckillTime")String endSeckillTime);
 
 }
