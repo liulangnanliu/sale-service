@@ -16,7 +16,7 @@ pipeline {
   stages {
     stage('Build Release') {
       when {
-        anyOf { branch 'develop*';  branch 'develop'; branch 'master'; branch 'feature*' }
+        anyOf { branch 'develop-*'; branch 'master'; branch 'feature*'; branch 'develop' }
       }
       steps {
         container('maven') {
@@ -47,14 +47,6 @@ pipeline {
             sh "docker tag $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat ../../VERSION) registry.cn-hangzhou.aliyuncs.com/jinnjo/$APP_NAME:\$(cat ../../VERSION)"
             sh "docker push registry.cn-hangzhou.aliyuncs.com/jinnjo/$APP_NAME:\$(cat ../../VERSION)"
             sh "echo registry.cn-hangzhou.aliyuncs.com/jinnjo/$APP_NAME:\$(cat ../../VERSION)"
-            //sh "jx step changelog --version v\$(cat ../../VERSION)"
-
-            // release the helm chart
-            // sh "helm init --client-only --stable-repo-url=http://chartmuseum.jx.shequren.cn"
-            // sh "jx step helm release"
-
-            // promote through all 'Auto' promotion Environments
-            // sh "jx promote -b --all-auto --no-wait --timeout 1h --version \$(cat ../../VERSION)"
           }
         }
       }
@@ -69,10 +61,6 @@ pipeline {
             sh "jx step changelog --version v\$(cat ../../VERSION)"
             sh "helm init --client-only --stable-repo-url=http://chartmuseum.jx.shequren.cn"
             // release the helm chart
-            //sh "jx step helm release"
-
-            // promote through all 'Auto' promotion Environments
-            //sh "jx promote -b --no-wait --env staging --timeout 1h --version \$(cat ../../VERSION)"
             sh "helm package ."
             sh "helm plugin install https://gitlab.shequren.cn/jinnjo/helm-push"
             sh "helm push -u $CHARTMUSEUM_CREDS_USR -p $CHARTMUSEUM_CREDS_PSW *.tgz http://chartmuseum.jx.shequren.cn"
@@ -98,7 +86,7 @@ pipeline {
             sh "jx step helm release"
 
             // promote through all 'Auto' promotion Environments
-            sh "jx promote -b --all-auto --no-wait --timeout 1h --version \$(cat ../../VERSION)"
+            //sh "jx promote -b --all-auto --no-wait --timeout 1h --version \$(cat ../../VERSION)"
           }
         }
       }
