@@ -8,6 +8,7 @@ import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import com.jinnjo.sale.job.SaleEndJob;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,12 +39,16 @@ public class TimeLimitBuyService {
         Date startSeckillTime = marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime();
         if(null == startSeckillTime)
             throw new ConstraintViolationException("新增的限时购活动时间不能为空!", new HashSet<>());
+
+        //保存商品信息到本地
+
         LocalDate localDate = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
         if(LocalDate.now().compareTo(localDate) == 0){//如果新增的活动商品是今天，那么直接修改商品的秒杀标识
 
         }
 
-        campaignCilent.addCampaigns(marketingCampaignVo);
+        String id = campaignCilent.addCampaigns(marketingCampaignVo);
+        System.out.println(id);
     }
 
     public void update(MarketingCampaignVo marketingCampaignVo){
@@ -65,12 +70,16 @@ public class TimeLimitBuyService {
             throw new ConstraintViolationException("当天限时购活动时间不能为空!", new HashSet<>());
         }
 
-        campaignCilent.addCampaigns(marketingCampaignVo);
+        campaignCilent.updateCampaign(marketingCampaignVo.getId(), marketingCampaignVo);
+    }
+
+    public Page<MarketingCampaignVo> getTimeLimitBuy(Integer page, Integer size , String startSeckillTime , String endSeckillTime, Integer status){
+        return campaignCilent.getSeckillByPage(startSeckillTime , endSeckillTime, page, size , status);
     }
 
     public void executeJob() throws JobExecutionException{
 
-        List<MarketingCampaignVo> campaignsByPages = campaignCilent.getCampaignsByPage("2019-09-10");//LocalDate.now().toString()
+        List<MarketingCampaignVo> campaignsByPages = campaignCilent.getCampaignsByPage("2019-09-16");//LocalDate.now().toString()
 
         List<String> goodIds = campaignsByPages.stream().map(marketingCampaignVo -> marketingCampaignVo.getDiscountSeckillInfo()).flatMap(discountSeckillInfoVo -> discountSeckillInfoVo.getSeckillGoodsList().stream()).map(seckillGoodsVo -> seckillGoodsVo.getGoodsSpecId()).collect(Collectors.toList());
 

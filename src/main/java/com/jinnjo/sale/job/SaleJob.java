@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @DisallowConcurrentExecution
 @Component
 @Slf4j
-@QuartzCronJob(name = "saleJob",group = "saleGroup",defaultCronExpression = "0 0 1 1 * ?")// 0 0/1 * * * ?
+@QuartzCronJob(name = "saleJob",group = "saleGroup",defaultCronExpression = "0 0 1 1 * ?")// 0 0/1 * * * ?    0 0 1 1 * ?
 public class SaleJob implements Job{
     private final TimeLimitBuyService timeLimitBuyService;
 
