@@ -2,6 +2,7 @@ package com.jinnjo.sale.clients;
 
 import com.jinnjo.base.feign.FeignSecurityBean;
 import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
+import com.jinnjo.sale.domain.vo.PageVo;
 import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +32,6 @@ public interface CampaignCilent {
     List<SeckillGoodsVo> getGoodsListBySeckTime(@RequestParam("startSeckillTime")String startSeckillTime,@RequestParam("endSeckillTime")String endSeckillTime);
 
     @GetMapping(value = "/campaigns/seckill/page", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
-    PageImpl<MarketingCampaignVo> getSeckillByPage(@RequestParam("startSeckillTime")String startSeckillTime, @RequestParam("endSeckillTime")String endSeckillTime, @RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("status") Integer status);
+    PageVo<MarketingCampaignVo> getSeckillByPage(@RequestParam("startSeckillTime")String startSeckillTime, @RequestParam("endSeckillTime")String endSeckillTime, @RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("status") Integer status);
 
 }

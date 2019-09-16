@@ -58,7 +58,6 @@ public class TimeLimitBuyController {
         return Optional.of(timeLimitBuyService.getTimeLimitBuy(page, size , startSeckillTime , endSeckillTime, status))
                        .map(t -> ResponseEntity.ok(pagedResourcesAssembler.toResource(t)))
                        .orElse(ResponseEntity.notFound().build());
-
     }
 
 }

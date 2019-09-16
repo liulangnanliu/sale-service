@@ -4,11 +4,15 @@ import com.jinnjo.base.util.StringUtil;
 import com.jinnjo.sale.clients.CampaignCilent;
 import com.jinnjo.sale.domain.vo.DiscountSeckillInfoVo;
 import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
+import com.jinnjo.sale.domain.vo.PageVo;
 import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import com.jinnjo.sale.job.SaleEndJob;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +78,9 @@ public class TimeLimitBuyService {
     }
 
     public Page<MarketingCampaignVo> getTimeLimitBuy(Integer page, Integer size , String startSeckillTime , String endSeckillTime, Integer status){
-        return campaignCilent.getSeckillByPage(startSeckillTime , endSeckillTime, page, size , status);
+        PageVo<MarketingCampaignVo> pageVo = campaignCilent.getSeckillByPage(startSeckillTime , endSeckillTime, page, size , status);
+
+        return new PageImpl<>(pageVo.getContent(), PageRequest.of(page, size), pageVo.getTotalElements());
     }
 
     public void executeJob() throws JobExecutionException{
