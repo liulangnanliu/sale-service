@@ -45,6 +45,10 @@ public class MarketingCampaignVo {
     @ApiModelProperty(value = "活动状态")
     private Integer status;
 
+    public MarketingCampaignVo(){
+
+    }
+
 
     public MarketingCampaignVo(String name, Date startTime, Date endTime, DiscountSeckillInfoVo discountSeckillInfo){
         this.name = name;
