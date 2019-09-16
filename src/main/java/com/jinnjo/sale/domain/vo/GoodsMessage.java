@@ -12,6 +12,6 @@ import lombok.Data;
 public class GoodsMessage {
     @ApiModelProperty(value = "商品id")
     private Long goodsId;
-    @ApiModelProperty(value = "1 增加标识  0 去掉标识")
-    private Integer upDown;
+    @ApiModelProperty(value = "限时购标识(否:0,是:1)")
+    private Boolean timeBugFlag;
 }
