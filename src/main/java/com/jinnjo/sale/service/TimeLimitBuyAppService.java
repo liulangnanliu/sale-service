@@ -1,5 +1,6 @@
 package com.jinnjo.sale.service;
 
+import com.jinnjo.sale.domain.vo.GoodInfoVo;
 import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 
 import java.util.List;
@@ -13,4 +14,5 @@ import java.util.List;
 public interface TimeLimitBuyAppService {
     MarketingCampaignVo getForTop();
     List<MarketingCampaignVo> getForList();
+    GoodInfoVo getGoodInfo(Long id);
 }

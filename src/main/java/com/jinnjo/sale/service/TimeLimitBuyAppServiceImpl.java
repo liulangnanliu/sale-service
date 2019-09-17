@@ -2,13 +2,17 @@ package com.jinnjo.sale.service;
 
 import com.jinnjo.sale.clients.CampaignCilent;
 import com.jinnjo.sale.domain.vo.DiscountSeckillInfoVo;
+import com.jinnjo.sale.domain.vo.GoodInfoVo;
 import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
+import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ConstraintViolationException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -62,5 +66,15 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
         return campaignCilent.getCampaignsByPage(date);
+    }
+
+    @Override
+    public GoodInfoVo getGoodInfo(Long id){
+        MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
+        if(null == campaignVo)
+            throw new ConstraintViolationException("当前商品没有设置限时购活动!", new HashSet<>());
+
+        SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
+        return new GoodInfoVo(campaignVo.getDiscountSeckillInfo(), seckillGoods);
     }
 }
