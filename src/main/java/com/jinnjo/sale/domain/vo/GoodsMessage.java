@@ -21,6 +21,6 @@ public class GoodsMessage {
 
     public GoodsMessage(Long goodsId, Boolean timeBugFlag){
         this.goodsId = goodsId;
-        this.timeBugFlag = getTimeBugFlag();
+        this.timeBugFlag = timeBugFlag;
     }
 }
