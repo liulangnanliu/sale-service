@@ -61,6 +61,6 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     public List<MarketingCampaignVo> getForList() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
-        return campaignCilent.getCampaignsByPage("2019-09-10");
+        return campaignCilent.getCampaignsByPage(date);
     }
 }
