@@ -14,4 +14,13 @@ public interface SaleChannels {
      */
     @Output(SALEOUTPUT)
     SubscribableChannel output();
+
+
+    String GOODSINPUT = "goodsinput";
+
+    /**
+     * 监听商品变更
+     */
+    @Output(GOODSINPUT)
+    SubscribableChannel input();
 }
