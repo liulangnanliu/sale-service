@@ -48,7 +48,6 @@ public class GoodsSkuSqr extends BaseEntity{
     private String spStr;
 
     @ApiModelProperty(value = "供购物车返回已经选择的商品和订单详情显示实际购买的规格属性名", name = "spStrVal")
-    @Transient
     private String spStrVal;
 
     @ApiModelProperty(value = "规格属性名ID和属性值ID的组合串(例如：1|1|2|1)", name = "spidStr")
