@@ -110,7 +110,18 @@ public class TimeLimitBuyService {
     public Page<MarketingCampaignVo> getTimeLimitBuy(Integer page, Integer size , String startSeckillTime , String endSeckillTime, Integer status){
         PageVo<MarketingCampaignVo> pageVo = campaignCilent.getSeckillByPage(startSeckillTime , endSeckillTime, page, size , status);
 
-        return new PageImpl<>(pageVo.getContent(), PageRequest.of(page, size), pageVo.getTotalElements());
+        List<MarketingCampaignVo> content = pageVo.getContent().stream().map(marketingCampaignVo -> {
+            long time = new Date().getTime();
+            if (time < marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime())
+                marketingCampaignVo.setTimeLimitStatus(0);
+            else if (time >= marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime() && time <= marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
+                marketingCampaignVo.setTimeLimitStatus(1);
+            else if (time > marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
+                marketingCampaignVo.setTimeLimitStatus(3);
+            return marketingCampaignVo;
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(content, PageRequest.of(page, size), pageVo.getTotalElements());
     }
 
     public void executeJob() throws JobExecutionException{

@@ -1,6 +1,8 @@
 package com.jinnjo.sale.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jinnjo.base.annotations.RestResource;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +30,10 @@ public class MarketingCampaignVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date currentTime = new Date();
+
     @ApiModelProperty(value = "使用位置 1 全部 2 App  3  小程序")
     private Integer usePosition = 1;
 
@@ -44,8 +50,12 @@ public class MarketingCampaignVo {
     @ApiModelProperty(value = "优惠券类型 (1 店铺券 2 平台券)")
     private Integer discountsType;
 
-    @ApiModelProperty(value = "活动状态")
+    @ApiModelProperty(value = "活动通用状态")
     private Integer status;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ApiModelProperty(value = "限时购活动状态")
+    private Integer timeLimitStatus;
 
     public MarketingCampaignVo(){
 
