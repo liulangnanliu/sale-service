@@ -22,7 +22,7 @@ import java.util.Optional;
 @Api(tags = "限时购商品活动")
 @Slf4j
 @RestController
-@RequestMapping("time-limit")
+@RequestMapping("/time-limit")
 public class TimeLimitBuyController {
     private final TimeLimitBuyService timeLimitBuyService;
 

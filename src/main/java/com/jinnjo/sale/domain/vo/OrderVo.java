@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -35,10 +36,10 @@ public class OrderVo {
     @ApiModelProperty(value = "身份名称")
     private String identityName;
 
-
     @ApiModelProperty(value = "订单下单渠道 1直播购买 2限时购下单 ")
     private Integer orderChannel;
 
+    @NotEmpty
     @ApiModelProperty(value = "订单子项")
     public List<OrderItemVo> orderItemVOList;
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @ApiModel(value="OrderItemVo",description = "订单子项VO对象")
@@ -14,21 +15,13 @@ import java.math.BigDecimal;
 @Setter
 @ToString
 public class OrderItemVo {
-    @ApiModelProperty(value = "商品状态")
-    private String goodStatus;
-
+    @NotNull
     @ApiModelProperty(value = "订单商品ID")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long goodsId;
 
     @ApiModelProperty(value = "商品类型：1-电子码 2-电子卡密")
     private Integer type;
-
-    @ApiModelProperty(value = "订单商品名称")
-    private String goodsName;
-
-    @ApiModelProperty(value = "订单商品图片")
-    private String goodsImg;
 
     @ApiModelProperty(value = "订单购买数量")
     private Integer goodsCount;
@@ -39,11 +32,9 @@ public class OrderItemVo {
     @ApiModelProperty(value = "订单商品折扣价格")
     private BigDecimal discountPrice;
 
+    @NotNull
     @ApiModelProperty(value = "订单商品规格ID")
     private String skuId;
-
-    @ApiModelProperty(value = "订单商品规格名称")
-    private String skuName;
 
     @ApiModelProperty(value = "类目id")
     private String categoryId;
@@ -104,4 +95,7 @@ public class OrderItemVo {
 
     @ApiModelProperty(value = "商品售卖来源(1 自营发卡  2 第三方发卡 3 365商品)")
     private int source;
+
+    @ApiModelProperty(value = "合伙人配送费")
+    private BigDecimal partnerDeliveryFee = BigDecimal.ZERO;
 }

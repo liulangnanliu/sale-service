@@ -5,12 +5,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @ApiModel(value="OrderSubmitVo", description = "统一下单订单参数VO对象")
 @Data
 public class OrderSubmitVo {
+    @NotEmpty
     @ApiModelProperty(value = "订单集合")
     private List<OrderVo> voList;
 

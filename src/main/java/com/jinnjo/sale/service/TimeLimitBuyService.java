@@ -7,7 +7,6 @@ import com.jinnjo.sale.domain.GoodsSqr;
 import com.jinnjo.sale.domain.vo.*;
 import com.jinnjo.sale.job.SaleEndJob;
 import com.jinnjo.sale.mq.SaleProducer;
-import com.jinnjo.sale.repo.GoodsSkuSqrRepository;
 import com.jinnjo.sale.repo.GoodsSqrRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -35,21 +34,18 @@ public class TimeLimitBuyService {
     private final Scheduler scheduler;
     private final SaleProducer saleProducer;
     private final GoodsSqrRepository goodsSqrRepository;
-    private final GoodsSkuSqrRepository goodsSkuSqrRepository;
 
     @Autowired
     public TimeLimitBuyService(CampaignCilent campaignCilent,
                                GoodsClient goodsClient,
                                Scheduler scheduler,
                                SaleProducer saleProducer,
-                               GoodsSqrRepository goodsSqrRepository,
-                               GoodsSkuSqrRepository goodsSkuSqrRepository){
+                               GoodsSqrRepository goodsSqrRepository){
         this.campaignCilent = campaignCilent;
         this.goodsClient = goodsClient;
         this.scheduler = scheduler;
         this.saleProducer = saleProducer;
         this.goodsSqrRepository = goodsSqrRepository;
-        this.goodsSkuSqrRepository = goodsSkuSqrRepository;
     }
 
     public void add(MarketingCampaignVo marketingCampaignVo){

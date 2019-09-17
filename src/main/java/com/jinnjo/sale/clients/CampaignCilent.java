@@ -34,4 +34,7 @@ public interface CampaignCilent {
     @GetMapping(value = "/campaigns/seckill/page", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     PageVo<MarketingCampaignVo> getSeckillByPage(@RequestParam("startSeckillTime")String startSeckillTime, @RequestParam("endSeckillTime")String endSeckillTime, @RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("status") Integer status);
 
+    @GetMapping(value = "/campaigns/goodsid", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
+    MarketingCampaignVo getCampaignsByGoodsId(@RequestParam("data") String date, @RequestParam("goodsId") Long goodsId);
+
 }

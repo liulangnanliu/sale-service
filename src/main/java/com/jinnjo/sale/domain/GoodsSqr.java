@@ -61,6 +61,9 @@ public class GoodsSqr  extends BaseEntity{
     @ApiModelProperty(value = "配送方式（配送+自提 0，仅配送 1，仅自提 2,默认按照店铺类型电商 仅配送，楼下小店 仅自提）", name = "distributionType")
     private Integer distributionType;
 
+    @ApiModelProperty(value = "是否分享赚商品(0:否(未申请),1:是,2:报名(待审核),3:未通过)", name = "isShareGoods")
+    private int isShareGoods;
+
     @ApiModelProperty(value = "是否积分兑换(积分兑换:1)", name = "isIntegralGoods")
     private String isIntegralGoods;
 
