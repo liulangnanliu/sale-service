@@ -19,15 +19,13 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity implements Identifiable<Long> {
     @Id
-    @GeneratedValue(generator = "idGenerator")
-    @GenericGenerator(name = "idGenerator", strategy = "com.jinnjo.base.twitter.hibernate.GenerateId")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Column(name = "id", nullable = false)
     @ApiModelProperty(value = "主键", name = "id")
     private Long id;
 
-    @ApiModelProperty(value = "状态(1正常 0删除,默认正常:1)", name = "status")
-    private Short status = 1;
+    @ApiModelProperty(value = "状态", name = "status")
+    private Short status;
 
     @Version
     private int version;

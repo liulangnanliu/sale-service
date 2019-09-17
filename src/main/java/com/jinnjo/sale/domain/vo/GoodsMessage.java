@@ -14,4 +14,13 @@ public class GoodsMessage {
     private Long goodsId;
     @ApiModelProperty(value = "限时购标识(否:0,是:1)")
     private Boolean timeBugFlag;
+
+    public GoodsMessage(){
+
+    }
+
+    public GoodsMessage(Long goodsId, Boolean timeBugFlag){
+        this.goodsId = goodsId;
+        this.timeBugFlag = getTimeBugFlag();
+    }
 }

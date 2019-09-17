@@ -2,17 +2,19 @@ package com.jinnjo.sale.service;
 
 import com.jinnjo.base.util.StringUtil;
 import com.jinnjo.sale.clients.CampaignCilent;
-import com.jinnjo.sale.domain.vo.DiscountSeckillInfoVo;
-import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
-import com.jinnjo.sale.domain.vo.PageVo;
-import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
+import com.jinnjo.sale.clients.GoodsClient;
+import com.jinnjo.sale.domain.GoodsSqr;
+import com.jinnjo.sale.domain.vo.*;
 import com.jinnjo.sale.job.SaleEndJob;
+import com.jinnjo.sale.mq.SaleProducer;
+import com.jinnjo.sale.repo.GoodsSkuSqrRepository;
+import com.jinnjo.sale.repo.GoodsSqrRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +31,25 @@ import java.util.stream.Collectors;
 @Service
 public class TimeLimitBuyService {
     private final CampaignCilent campaignCilent;
+    private final GoodsClient goodsClient;
     private final Scheduler scheduler;
+    private final SaleProducer saleProducer;
+    private final GoodsSqrRepository goodsSqrRepository;
+    private final GoodsSkuSqrRepository goodsSkuSqrRepository;
 
+    @Autowired
     public TimeLimitBuyService(CampaignCilent campaignCilent,
-                               Scheduler scheduler){
+                               GoodsClient goodsClient,
+                               Scheduler scheduler,
+                               SaleProducer saleProducer,
+                               GoodsSqrRepository goodsSqrRepository,
+                               GoodsSkuSqrRepository goodsSkuSqrRepository){
         this.campaignCilent = campaignCilent;
+        this.goodsClient = goodsClient;
         this.scheduler = scheduler;
+        this.saleProducer = saleProducer;
+        this.goodsSqrRepository = goodsSqrRepository;
+        this.goodsSkuSqrRepository = goodsSkuSqrRepository;
     }
 
     public void add(MarketingCampaignVo marketingCampaignVo){
@@ -45,14 +60,33 @@ public class TimeLimitBuyService {
             throw new ConstraintViolationException("新增的限时购活动时间不能为空!", new HashSet<>());
 
         //保存商品信息到本地
+        saveGoodsInfo(marketingCampaignVo);
+
+        String campaignsId = campaignCilent.addCampaigns(marketingCampaignVo);
+
+        log.info("新增限时购活动营销活动返回id : " + campaignsId);
 
         LocalDate localDate = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
-        if(LocalDate.now().compareTo(localDate) == 0){//如果新增的活动商品是今天，那么直接修改商品的秒杀标识
+        if(LocalDate.now().compareTo(localDate) == 0)//如果新增的活动商品是今天，那么直接修改商品的秒杀标识
+            saleProducer.produceSend(marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> new GoodsMessage(seckillGoodsVo.getGoodsId(), true)).collect(Collectors.toList()), "");
 
-        }
 
-        String id = campaignCilent.addCampaigns(marketingCampaignVo);
-        System.out.println(id);
+    }
+
+    private void saveGoodsInfo(MarketingCampaignVo marketingCampaignVo){
+        List<SeckillGoodsVo> seckillGoodsList = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList();
+
+        //查询已存在的商品实例id
+        List<String> localGoodIds = goodsSqrRepository.queryAllByIdNotIn(seckillGoodsList.stream().map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList())).stream().map(t -> t.toString()).collect(Collectors.toList());
+
+        //查询商品信息
+        String goodIds = seckillGoodsList.stream().map(seckillGoodsVo -> String.valueOf(seckillGoodsVo.getGoodsId())).filter(t -> !localGoodIds.contains(t)).collect(Collectors.joining(","));
+
+        if(StringUtil.isEmpty(goodIds))
+            return;
+
+        Collection<GoodsSqr> goods = goodsClient.findGoods(seckillGoodsList.size(), "id::" + goodIds).getContent();
+        goodsSqrRepository.saveAll(goods);
     }
 
     public void update(MarketingCampaignVo marketingCampaignVo){
@@ -87,10 +121,10 @@ public class TimeLimitBuyService {
 
         List<MarketingCampaignVo> campaignsByPages = campaignCilent.getCampaignsByPage("2019-09-16");//LocalDate.now().toString()
 
-        List<String> goodIds = campaignsByPages.stream().map(marketingCampaignVo -> marketingCampaignVo.getDiscountSeckillInfo()).flatMap(discountSeckillInfoVo -> discountSeckillInfoVo.getSeckillGoodsList().stream()).map(seckillGoodsVo -> seckillGoodsVo.getGoodsSpecId()).collect(Collectors.toList());
+        List<Long> goodIds = campaignsByPages.stream().map(marketingCampaignVo -> marketingCampaignVo.getDiscountSeckillInfo()).flatMap(discountSeckillInfoVo -> discountSeckillInfoVo.getSeckillGoodsList().stream()).map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList());
 
         //今天所有的商品标识为限时购商品
-
+        saleProducer.produceSend(goodIds.stream().map(goodId -> new GoodsMessage(goodId, true)).collect(Collectors.toList()), "");
 
         campaignsByPages.forEach(marketingCampaignVo -> {
             DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfo();
@@ -117,7 +151,9 @@ public class TimeLimitBuyService {
 
     public void executeSaleEndJob(String startSeckillTime, String endSeckillTime){
         List<SeckillGoodsVo> seckillGoods = campaignCilent.getGoodsListBySeckTime(startSeckillTime, endSeckillTime);
-        List<String> goodIds = seckillGoods.stream().map(seckillGoodsVo -> seckillGoodsVo.getGoodsSpecId()).collect(Collectors.toList());
+        List<Long> goodIds = seckillGoods.stream().map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList());
         //将所有商品的限时购标识取消
+        saleProducer.produceSend(goodIds.stream().map(goodId -> new GoodsMessage(goodId, false)).collect(Collectors.toList()), "");
+
     }
 }

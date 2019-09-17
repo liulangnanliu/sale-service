@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 public class SeckillGoodsVo {
     @ApiModelProperty(value = "商品编号")
-    private String goodsId;
+    private Long goodsId;
 
     @ApiModelProperty(value = "商品名称")
     private String goodsName;
@@ -17,7 +17,7 @@ public class SeckillGoodsVo {
     private String goodsImg;
 
     @ApiModelProperty(value = "商品规格id")
-    private String goodsSpecId;
+    private Long goodsSpecId;
 
     @ApiModelProperty(value = "规格名称")
     private String goodsSpecName;

@@ -26,7 +26,7 @@ public class SaleProducer {
 
 
     public void produceSend(List<GoodsMessage> goodsMessageList, String routingKey){
-        log.info("通知短信微服务发送:");
+        log.info("通知商品微服务发送:");
         saleChannels.output().send(MessageBuilder.withPayload(goodsMessageList).setHeader("routing-key",routingKey).build());
     }
 
