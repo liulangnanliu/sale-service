@@ -1,14 +1,15 @@
 package com.jinnjo.sale.controller;
 
-import com.jinnjo.sale.domain.vo.DiscountSeckillInfoVo;
 import com.jinnjo.sale.domain.vo.GoodInfoVo;
 import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
+import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import com.jinnjo.sale.service.TimeLimitBuyAppService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,13 @@ public class TimeLimitBuyAppController {
     public ResponseEntity<List<MarketingCampaignVo>> getForList(){
         log.info("限时购列表");
         return Optional.ofNullable(timeLimitBuyAppService.getForList()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @ApiOperation(value = "限时购详情", notes = "限时购详情")
+    @GetMapping(value = "/{id}",produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<Page<SeckillGoodsVo>> getById(@PathVariable("id")String id,@RequestParam("page")Integer page,@RequestParam("size")Integer size){
+        log.info("限时购详情{}",id);
+        return Optional.ofNullable(timeLimitBuyAppService.getById(id,page,size)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "限时购商品详情", notes = "限时购商品详情")

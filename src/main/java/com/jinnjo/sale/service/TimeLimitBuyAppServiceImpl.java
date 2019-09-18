@@ -7,6 +7,10 @@ import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
@@ -38,6 +42,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             return null;
         }
         List<MarketingCampaignVo> marketingCampaignVoArrayList = new ArrayList<>();
+        List<MarketingCampaignVo> finallyList = new ArrayList<>();
         for (MarketingCampaignVo marketingCampaignVo:marketingCampaignVoList){
             DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfo();
             if (null!=discountSeckillInfoVo){
@@ -46,18 +51,51 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                 Date nowTime = new Date();
                 if (startTime.before(nowTime)&&endTime.after(nowTime)){
                     //当前时间在活动时间段内
+                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
+                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+                    if (seckillGoodsVoList.size()>2){
+                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
+                    }
                     return marketingCampaignVo;
                 }
-                if (endTime.after(nowTime)){
+                if (endTime.after(nowTime)&&startTime.after(nowTime)){
+                    //当前时间在活动时间段之前
                     Long start = startTime.getTime();
                     Long now = nowTime.getTime();
                     Long interval = start - now;
                     marketingCampaignVo.setInterval(interval);
+                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
+                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+                    if (seckillGoodsVoList.size()>2){
+                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
+                    }
                     marketingCampaignVoArrayList.add(marketingCampaignVo);
+                }
+                if (endTime.before(nowTime)){
+                    //当前时间在活动时间段之后
+                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
+                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+                    if (seckillGoodsVoList.size()>2){
+                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
+                    }
+                    finallyList.add(marketingCampaignVo);
                 }
             }
         }
-        return marketingCampaignVoArrayList.stream().min(Comparator.comparing(MarketingCampaignVo::getInterval)).orElse(null);
+        if (marketingCampaignVoArrayList.size()>0){
+            return marketingCampaignVoArrayList.stream().min(Comparator.comparing(MarketingCampaignVo::getInterval)).orElse(null);
+        }
+        return finallyList.stream().max(Comparator.comparing(MarketingCampaignVo::getEndTime)).orElse(null);
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public Page<SeckillGoodsVo> getById(String id,Integer page,Integer size) {
+        Pageable pageable = PageRequest.of(page,size);
+        MarketingCampaignVo marketingCampaignVo = campaignCilent.getCampaignById(id);
+        List<SeckillGoodsVo> seckillGoodsVoList = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList();
+        Page<SeckillGoodsVo> seckillGoodsVoPage = new PageImpl(seckillGoodsVoList,pageable,seckillGoodsVoList.size());
+        return seckillGoodsVoPage;
     }
 
     @Override
