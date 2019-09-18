@@ -33,4 +33,13 @@ public class SeckillGoodsVo {
 
     @ApiModelProperty(value = "商品的状态 0 正常 4 删除|下架")
     private Integer status;
+
+    @ApiModelProperty(value = "销售城市")
+    private String citycode;
+
+    @ApiModelProperty(value = "原价")
+    private BigDecimal price;
+
+    @ApiModelProperty(value = "折扣价")
+    private BigDecimal discountPrice;
 }
