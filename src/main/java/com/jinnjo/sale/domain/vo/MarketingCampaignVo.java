@@ -51,11 +51,11 @@ public class MarketingCampaignVo {
     @ApiModelProperty(value = "优惠券类型 (1 店铺券 2 平台券)")
     private Integer discountsType;
 
-    @ApiModelProperty(value = "活动通用状态")
+    @ApiModelProperty(value = "活动通用状态1  开启  2  关闭")
     private Integer status;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @ApiModelProperty(value = "限时购活动状态")
+    @ApiModelProperty(value = "限时购活动状态(待开启  0  已开启 1   已结束3)")
     private Integer timeLimitStatus;
 
     public MarketingCampaignVo(){
