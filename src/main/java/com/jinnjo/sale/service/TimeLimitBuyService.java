@@ -111,6 +111,10 @@ public class TimeLimitBuyService {
         campaignCilent.deleteCampaign(id);
     }
 
+    public void deleteGoods(Long id, Long goodsId){
+        campaignCilent.deleteGoods(id, goodsId);
+    }
+
     public void changeStatus(Long id, Integer status){
         campaignCilent.changeStatus(id, status);
     }

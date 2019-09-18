@@ -69,8 +69,16 @@ public class TimeLimitBuyController {
         timeLimitBuyService.delete(id);
     }
 
+    @ApiOperation(value = "删除限时购活动商品", notes = "删除限时购活动商品")
+    @DeleteMapping(value = "/goods")
+    public void deleteTimeLimitBuyGoods(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id,
+                                        @ApiParam(name = "goodsId", value = "商品id", required = true) @RequestParam Long goodsId){
+        log.info("删除限时购活动商品id:{} goodsId:{}", id, goodsId);
+        timeLimitBuyService.deleteGoods(id, goodsId);
+    }
+
     @ApiOperation(value = "变更限时购活动状态", notes = "变更限时购活动状态")
-    @PutMapping(produces = MediaTypes.HAL_JSON_VALUE)
+    @PutMapping(value = "/changeStatus", produces = MediaTypes.HAL_JSON_VALUE)
     public void shutTimeLimitBuy(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id,
                                  @ApiParam(name = "status", value = "活动状态(1 开启 2 关闭)", required = true) @RequestParam Integer status){
         log.info("变更限时购活动状态id:{} status:{}", id, status);
