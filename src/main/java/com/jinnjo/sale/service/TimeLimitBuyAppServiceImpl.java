@@ -64,7 +64,35 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     public List<MarketingCampaignVo> getForList() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
-        return campaignCilent.getCampaignsByPage(date);
+        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date);
+        if (marketingCampaignVoList.size()<=0){
+            return null;
+        }
+        for (MarketingCampaignVo marketingCampaignVo:marketingCampaignVoList){
+            DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfo();
+            if (null!=discountSeckillInfoVo){
+                Date startTime = discountSeckillInfoVo.getStartSeckillTime();
+                Date endTime = discountSeckillInfoVo.getEndSeckillTime();
+                Date nowTime = new Date();
+                if (startTime.after(nowTime)){
+                    //未开启
+                    marketingCampaignVo.setTimeLimitStatus(0);
+                }
+                if (startTime.before(nowTime)&&endTime.after(nowTime)){
+                    //当前时间在活动时间段内
+                    if (marketingCampaignVo.getStatus().equals(1)){
+                        marketingCampaignVo.setTimeLimitStatus(1);
+                    }else {
+                        marketingCampaignVo.setTimeLimitStatus(3);
+                    }
+                }
+                if (endTime.before(nowTime)){
+                    //已结束
+                    marketingCampaignVo.setTimeLimitStatus(3);
+                }
+            }
+        }
+        return marketingCampaignVoList;
     }
 
     @Override
