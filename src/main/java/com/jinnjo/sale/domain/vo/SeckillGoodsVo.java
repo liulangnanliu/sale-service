@@ -19,6 +19,9 @@ public class SeckillGoodsVo {
     @ApiModelProperty(value = "商品规格id")
     private Long goodsSpecId;
 
+    @ApiModelProperty(value = "库存")
+    private int stock;
+
     @ApiModelProperty(value = "规格名称")
     private String goodsSpecName;
 
