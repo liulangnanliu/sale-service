@@ -30,7 +30,8 @@ public class MarketingCampaignVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ApiModelProperty(value = "当前时间时间")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date currentTime = new Date();
 
@@ -53,7 +54,7 @@ public class MarketingCampaignVo {
     @ApiModelProperty(value = "活动通用状态")
     private Integer status;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ApiModelProperty(value = "限时购活动状态")
     private Integer timeLimitStatus;
 

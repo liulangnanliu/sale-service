@@ -21,7 +21,7 @@ public class SaleListener {
     }
 
     @StreamListener(value = SaleChannels.GOODSINPUT)
-    public void orderInfoChange(@Payload ListenGoodsView listenGoodsView){
+    public void goodsInfoChange(@Payload ListenGoodsView listenGoodsView){
         log.info("监听商品变更{}", JSON.toJSONString(listenGoodsView));
         goodsSqrService.update(listenGoodsView);
     }

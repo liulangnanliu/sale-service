@@ -75,7 +75,7 @@ public class GoodsSqr  extends BaseEntity{
 
     @ApiModelProperty(value = "商品规格", name = "skuInfos")
     @NotNull(message = "商品规格信息不能为空！")
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "goods_info_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     private List<GoodsSkuSqr> skuInfos;
 
