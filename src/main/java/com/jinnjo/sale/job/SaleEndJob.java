@@ -6,6 +6,7 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class SaleEndJob implements Job {
     private final TimeLimitBuyService timeLimitBuyService;
 
+    @Autowired
     public SaleEndJob(TimeLimitBuyService timeLimitBuyService){
         this.timeLimitBuyService = timeLimitBuyService;
     }

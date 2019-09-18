@@ -62,4 +62,28 @@ public class TimeLimitBuyController {
                        .orElse(ResponseEntity.notFound().build());
     }
 
+    @ApiOperation(value = "删除限时购活动", notes = "删除限时购活动")
+    @DeleteMapping
+    public void deleteTimeLimitBuy(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id){
+        log.info("删除限时购活动id:{}", id);
+        timeLimitBuyService.delete(id);
+    }
+
+    @ApiOperation(value = "变更限时购活动状态", notes = "变更限时购活动状态")
+    @PutMapping(produces = MediaTypes.HAL_JSON_VALUE)
+    public void shutTimeLimitBuy(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id,
+                                 @ApiParam(name = "status", value = "活动状态(1 开启 2 关闭)", required = true) @RequestParam Integer status){
+        log.info("变更限时购活动状态id:{} status:{}", id, status);
+        timeLimitBuyService.changeStatus(id, status);
+    }
+
+
+    @ApiOperation(value = "验证秒杀商品在当天的场次中是否重复", notes = "验证秒杀商品在当天的场次中是否重复")
+    @GetMapping(value = "/check", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<Long> checkSeckillGoods(@ApiParam(name = "date", value = "校验日期", required = true) @RequestParam String date,
+                                                  @ApiParam(name = "goodsId", value = "商品id", required = true) @RequestParam Long goodsId){
+        log.info("验证秒杀商品在当天的场次中是否重复date:{} goodsId:{}", date, goodsId);
+
+        return Optional.of(timeLimitBuyService.checkSeckillGoods(date, goodsId)).map(ResponseEntity :: ok).orElse(ResponseEntity.notFound().build());
+    }
 }

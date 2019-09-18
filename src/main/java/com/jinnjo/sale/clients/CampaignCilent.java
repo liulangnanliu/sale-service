@@ -28,6 +28,12 @@ public interface CampaignCilent {
     @PutMapping(value = "/campaigns/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     MarketingCampaignVo updateCampaign(@PathVariable("id") String id, @RequestBody MarketingCampaignVo marketingCampaignVo);
 
+    @DeleteMapping(value = "/campaigns/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
+    void deleteCampaign(@PathVariable("id") Long id);
+
+    @PatchMapping(value = "/campaigns/change-status/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
+    void changeStatus(@PathVariable("id") Long id, @RequestParam("status") Integer status);
+
     @GetMapping(value = "/campaigns/testgoods", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     List<SeckillGoodsVo> getGoodsListBySeckTime(@RequestParam("startSeckillTime")String startSeckillTime,@RequestParam("endSeckillTime")String endSeckillTime);
 
@@ -36,5 +42,8 @@ public interface CampaignCilent {
 
     @GetMapping(value = "/campaigns/goodsid", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     MarketingCampaignVo getCampaignsByGoodsId(@RequestParam("data") String date, @RequestParam("goodsId") Long goodsId);
+
+    @GetMapping(value = "/campaigns/checkseckillgoods", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
+    Long checkSeckillGoods(@RequestParam("data") String date, @RequestParam("goodsId") Long goodsId);
 
 }

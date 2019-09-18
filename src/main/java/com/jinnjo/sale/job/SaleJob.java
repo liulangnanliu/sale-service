@@ -6,6 +6,7 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @DisallowConcurrentExecution
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class SaleJob implements Job{
     private final TimeLimitBuyService timeLimitBuyService;
 
+    @Autowired
     public SaleJob(TimeLimitBuyService timeLimitBuyService){
         this.timeLimitBuyService = timeLimitBuyService;
     }

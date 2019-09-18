@@ -107,6 +107,14 @@ public class TimeLimitBuyService {
         campaignCilent.updateCampaign(marketingCampaignVo.getId(), marketingCampaignVo);
     }
 
+    public void delete(Long id){
+        campaignCilent.deleteCampaign(id);
+    }
+
+    public void changeStatus(Long id, Integer status){
+        campaignCilent.changeStatus(id, status);
+    }
+
     public Page<MarketingCampaignVo> getTimeLimitBuy(Integer page, Integer size , String startSeckillTime , String endSeckillTime, Integer status){
         PageVo<MarketingCampaignVo> pageVo = campaignCilent.getSeckillByPage(startSeckillTime , endSeckillTime, page, size , status);
 
@@ -115,13 +123,17 @@ public class TimeLimitBuyService {
             if (time < marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime())
                 marketingCampaignVo.setTimeLimitStatus(0);
             else if (time >= marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime() && time <= marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
-                marketingCampaignVo.setTimeLimitStatus(1);
+                marketingCampaignVo.setTimeLimitStatus(2 == marketingCampaignVo.getStatus() ? 3 : 1);
             else if (time > marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
                 marketingCampaignVo.setTimeLimitStatus(3);
             return marketingCampaignVo;
         }).collect(Collectors.toList());
 
         return new PageImpl<>(content, PageRequest.of(page, size), pageVo.getTotalElements());
+    }
+
+    public Long checkSeckillGoods(String date, Long goodsId){
+        return campaignCilent.checkSeckillGoods(date, goodsId);
     }
 
     public void executeJob() throws JobExecutionException{
