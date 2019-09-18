@@ -89,9 +89,10 @@ public class TimeLimitBuyController {
     @ApiOperation(value = "验证秒杀商品在当天的场次中是否重复", notes = "验证秒杀商品在当天的场次中是否重复")
     @GetMapping(value = "/check", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Long> checkSeckillGoods(@ApiParam(name = "date", value = "校验日期", required = true) @RequestParam String date,
-                                                  @ApiParam(name = "goodsId", value = "商品id", required = true) @RequestParam Long goodsId){
-        log.info("验证秒杀商品在当天的场次中是否重复date:{} goodsId:{}", date, goodsId);
+                                                  @ApiParam(name = "goodsId", value = "商品id", required = true) @RequestParam Long goodsId,
+                                                  @ApiParam(name = "goodsSpecId", value = "商品规格id", required = true) @RequestParam Long goodsSpecId){
+        log.info("验证秒杀商品在当天的场次中是否重复date:{} goodsId:{} goodsSpecId:{}", date, goodsId, goodsSpecId);
 
-        return Optional.of(timeLimitBuyService.checkSeckillGoods(date, goodsId)).map(ResponseEntity :: ok).orElse(ResponseEntity.notFound().build());
+        return Optional.of(timeLimitBuyService.checkSeckillGoods(date, goodsId, goodsSpecId)).map(ResponseEntity :: ok).orElse(ResponseEntity.notFound().build());
     }
 }

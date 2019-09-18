@@ -55,6 +55,18 @@ public class TimeLimitBuyService {
         if(null == startSeckillTime)
             throw new ConstraintViolationException("新增的限时购活动时间不能为空!", new HashSet<>());
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime()));
+        if(timeFlag == 1)
+            throw new ConstraintViolationException("新增的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
+
+        LocalDate seckillTime = LocalDateTime.ofInstant(marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime().toInstant(), ZoneId.systemDefault()).toLocalDate();
+
+        String goodsIds = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> String.valueOf(seckillGoodsVo.getGoodsId())).collect(Collectors.joining(","));
+        List<String> seckillGoodsList = campaignCilent.checkSeckillGoodsList(seckillTime.toString(), goodsIds);
+        if(seckillGoodsList.size() > 0)
+            throw new ConstraintViolationException("新增的限时购活动商品已存在!", new HashSet<>());
+
         //保存商品信息到本地
         saveGoodsInfo(marketingCampaignVo);
 
@@ -136,8 +148,8 @@ public class TimeLimitBuyService {
         return new PageImpl<>(content, PageRequest.of(page, size), pageVo.getTotalElements());
     }
 
-    public Long checkSeckillGoods(String date, Long goodsId){
-        return campaignCilent.checkSeckillGoods(date, goodsId);
+    public Long checkSeckillGoods(String date, Long goodsId, Long goodsSpecId){
+        return campaignCilent.checkSeckillGoods(date, goodsId, goodsSpecId);
     }
 
     public void executeJob() throws JobExecutionException{

@@ -30,4 +30,7 @@ public class SeckillGoodsVo {
 
     @ApiModelProperty(value = "秒杀价格")
     private BigDecimal seckillPrice;
+
+    @ApiModelProperty(value = "商品的状态 0 正常 4 删除|下架")
+    private Integer status;
 }
