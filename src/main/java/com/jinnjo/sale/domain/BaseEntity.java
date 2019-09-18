@@ -25,7 +25,7 @@ public class BaseEntity implements Identifiable<Long> {
     private Long id;
 
     @ApiModelProperty(value = "状态", name = "status")
-    private Short status;
+    private Integer status;
 
     @Version
     private int version;
