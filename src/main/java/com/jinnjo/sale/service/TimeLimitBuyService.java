@@ -65,7 +65,7 @@ public class TimeLimitBuyService {
         String goodsIds = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> String.valueOf(seckillGoodsVo.getGoodsId())).collect(Collectors.joining(","));
         List<String> seckillGoodsList = campaignCilent.checkSeckillGoodsList(seckillTime.toString(), goodsIds);
         if(seckillGoodsList.size() > 0)
-            throw new ConstraintViolationException("新增的限时购活动商品已存在!", new HashSet<>());
+            throw new ConstraintViolationException("新增的限时购活动商品"+seckillGoodsList.stream().collect(Collectors.joining(","))+"已存在!", new HashSet<>());
 
         //保存商品信息到本地
         saveGoodsInfo(marketingCampaignVo);
@@ -108,13 +108,11 @@ public class TimeLimitBuyService {
         Date startSeckillTime = marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime();
         if(null == startSeckillTime)
             throw new ConstraintViolationException("限时购活动时间不能为空!", new HashSet<>());
-        LocalDate localDate = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
-        if(LocalDate.now().compareTo(localDate) == 0){//如果新增的活动商品是今天，那么直接修改商品的秒杀标识
-            MarketingCampaignVo target = campaignCilent.getCampaignById(marketingCampaignVo.getId());
-            if(!target.getDiscountSeckillInfo().getStartSeckillTime().equals(marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime())
-                    || !target.getDiscountSeckillInfo().getEndSeckillTime().equals(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime()))
-            throw new ConstraintViolationException("当天限时购活动时间不能修改!", new HashSet<>());
-        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime()));
+        if(timeFlag == 1)
+            throw new ConstraintViolationException("修改的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
 
         campaignCilent.updateCampaign(marketingCampaignVo.getId(), marketingCampaignVo);
     }
@@ -129,6 +127,10 @@ public class TimeLimitBuyService {
 
     public void changeStatus(Long id, Integer status){
         campaignCilent.changeStatus(id, status);
+    }
+
+    public MarketingCampaignVo getTimeLimitBuyById(Long id){
+        return campaignCilent.getCampaignById(id);
     }
 
     public Page<MarketingCampaignVo> getTimeLimitBuy(Integer page, Integer size , String startSeckillTime , String endSeckillTime, Integer status){

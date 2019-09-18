@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.core.Relation;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -19,6 +20,9 @@ public class MarketingCampaignVo {
 
     @ApiModelProperty(value = "名称")
     private String name;
+
+    @ApiModelProperty(value = "营销创建开始时间")
+    private LocalDateTime createAt;
 
     @ApiModelProperty(value = "营销活动开始时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

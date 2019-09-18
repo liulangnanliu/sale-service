@@ -48,6 +48,15 @@ public class TimeLimitBuyController {
         timeLimitBuyService.update(marketingCampaignVo);
     }
 
+    @ApiOperation(value = "根据id查询限时购活动", notes = "根据id查询限时购活动")
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<MarketingCampaignVo> getTimeLimitBuyById(@ApiParam(name = "id", value = "活动id", required = true) @PathVariable Long id){
+        log.info("根据id查询限时购活动id:{}", id);
+        return Optional.of(timeLimitBuyService.getTimeLimitBuyById(id))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @ApiOperation(value = "查询限时购活动", notes = "查询限时购活动")
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedResources<Resource<MarketingCampaignVo>>> getTimeLimitBuy(@ApiParam(name = "page", value = "当前页", required = true) @RequestParam Integer page,

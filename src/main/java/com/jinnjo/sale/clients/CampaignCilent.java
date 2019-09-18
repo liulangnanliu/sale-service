@@ -24,7 +24,7 @@ public interface CampaignCilent {
     List<MarketingCampaignVo> getCampaignsByPage(@RequestParam("date") String date);
 
     @GetMapping(value = "/campaigns/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
-    MarketingCampaignVo getCampaignById(@PathVariable("id") String id);
+    MarketingCampaignVo getCampaignById(@PathVariable("id") Long id);
 
     @PutMapping(value = "/campaigns/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     MarketingCampaignVo updateCampaign(@PathVariable("id") String id, @RequestBody MarketingCampaignVo marketingCampaignVo);
