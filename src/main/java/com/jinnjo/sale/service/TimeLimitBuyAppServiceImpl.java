@@ -56,6 +56,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     if (seckillGoodsVoList.size()>2){
                         discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
                     }
+                    marketingCampaignVo.setTimeLimitStatus(1);
                     return marketingCampaignVo;
                 }
                 if (endTime.after(nowTime)&&startTime.after(nowTime)){
@@ -69,6 +70,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     if (seckillGoodsVoList.size()>2){
                         discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
                     }
+                    marketingCampaignVo.setTimeLimitStatus(0);
                     marketingCampaignVoArrayList.add(marketingCampaignVo);
                 }
                 if (endTime.before(nowTime)){
@@ -78,6 +80,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     if (seckillGoodsVoList.size()>2){
                         discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
                     }
+                    marketingCampaignVo.setTimeLimitStatus(3);
                     finallyList.add(marketingCampaignVo);
                 }
             }
@@ -90,11 +93,12 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
 
     @Override
     @SuppressWarnings("all")
-    public Page<SeckillGoodsVo> getById(String id,Integer page,Integer size) {
+    public Page<SeckillGoodsVo> getById(Long id,Integer page,Integer size) {
         Pageable pageable = PageRequest.of(page,size);
         MarketingCampaignVo marketingCampaignVo = campaignCilent.getCampaignById(id);
         List<SeckillGoodsVo> seckillGoodsVoList = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList();
-        Page<SeckillGoodsVo> seckillGoodsVoPage = new PageImpl(seckillGoodsVoList,pageable,seckillGoodsVoList.size());
+        int total = seckillGoodsVoList.size();
+        Page<SeckillGoodsVo> seckillGoodsVoPage = new PageImpl(seckillGoodsVoList.subList(page*size,total<(page+1)*size?total:(page+1)*size),pageable,total);
         return seckillGoodsVoPage;
     }
 

@@ -50,7 +50,7 @@ public class TimeLimitBuyAppController {
 
     @ApiOperation(value = "限时购详情", notes = "限时购详情")
     @GetMapping(value = "/{id}",produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<Page<SeckillGoodsVo>> getById(@PathVariable("id")String id,@RequestParam("page")Integer page,@RequestParam("size")Integer size){
+    public ResponseEntity<Page<SeckillGoodsVo>> getById(@PathVariable("id")Long id,@RequestParam("page")Integer page,@RequestParam("size")Integer size){
         log.info("限时购详情{}",id);
         return Optional.ofNullable(timeLimitBuyAppService.getById(id,page,size)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
