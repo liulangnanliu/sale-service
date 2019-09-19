@@ -1,6 +1,7 @@
 package com.jinnjo.sale.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -17,10 +18,17 @@ public class GoodInfoVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date endSeckillTime;
 
+    @ApiModelProperty(value = "当前时间时间")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date currentTime = new Date();
+
     @ApiModelProperty(value = "商品id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long goodsId;
 
     @ApiModelProperty(value = "商品规格id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long skuId;
 
     @ApiModelProperty(value = "规格名称")

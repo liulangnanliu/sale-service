@@ -1,5 +1,6 @@
 package com.jinnjo.sale.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import java.math.BigDecimal;
 @Data
 public class SeckillGoodsVo {
     @ApiModelProperty(value = "商品编号")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long goodsId;
 
     @ApiModelProperty(value = "商品名称")
@@ -17,6 +19,7 @@ public class SeckillGoodsVo {
     private String goodsImg;
 
     @ApiModelProperty(value = "商品规格id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long goodsSpecId;
 
     @ApiModelProperty(value = "库存")
