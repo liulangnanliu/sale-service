@@ -18,9 +18,11 @@ public class GoodInfoVo {
     private Date endSeckillTime;
 
     @ApiModelProperty(value = "商品id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long goodsId;
 
     @ApiModelProperty(value = "商品规格id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long skuId;
 
     @ApiModelProperty(value = "规格名称")

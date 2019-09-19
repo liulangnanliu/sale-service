@@ -1,5 +1,6 @@
 package com.jinnjo.sale.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ import lombok.Data;
 @Data
 public class GoodsMessage {
     @ApiModelProperty(value = "商品id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long goodsId;
     @ApiModelProperty(value = "限时购标识(否:0,是:1)")
     private Boolean timeBugFlag;
