@@ -45,7 +45,7 @@ public class SaleJobQuartzScheduler {
                 QuartzCronJob annotation = jobClazz.getAnnotation(QuartzCronJob.class);
                 String name = annotation.name();
                 String group = annotation.group();
-                String cronExpression =annotation.defaultCronExpression();
+                String cronExpression = annotation.defaultCronExpression();
                 startJob(scheduler,jobClazz,name,group,cronExpression);
             }else{
                 log.error("job instance：" +jobClazz.getName()+ " not exist annotation QuartzCronJob！");
