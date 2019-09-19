@@ -72,7 +72,6 @@ public class TimeLimitBuyOrderService {
             throw new ConstraintViolationException("限时购活动已结束，价格发生变动，请重新下单!", new HashSet<>());
 
         //校验用户的限购数量
-
         String buyCount = null;
         if(null != seckillGoods.getLimitCount()){ //null为不限购
             buyCount = stringRedisTemplate17.opsForValue().get("timeLimitUser" + UserUtil.getCurrentUserId() + "_" + orderItemVo.getGoodsId());

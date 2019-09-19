@@ -79,4 +79,11 @@ public class TimeLimitBuyAppController {
         log.info("限时提醒id:{}", id);
         timeLimitBuyAppService.remind(id);
     }
+
+    @ApiOperation(value = "延迟回调", notes = "延迟回调")
+    @GetMapping(value = "/notify")
+    public void remindNotify(@RequestParam String userId, @RequestParam String goodsId){
+        log.info("延迟回调userId:{} goodsId:{}", userId, goodsId);
+        timeLimitBuyAppService.remindNotify(Long.parseLong(userId), Long.parseLong(goodsId));
+    }
 }

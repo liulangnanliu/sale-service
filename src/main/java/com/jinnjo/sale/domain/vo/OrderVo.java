@@ -37,7 +37,7 @@ public class OrderVo {
     private String identityName;
 
     @ApiModelProperty(value = "订单下单渠道 1直播购买 2限时购下单 ")
-    private Integer orderChannel;
+    private Integer orderChannel = 2;
 
     @NotEmpty
     @ApiModelProperty(value = "订单子项")

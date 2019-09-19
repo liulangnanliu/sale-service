@@ -20,4 +20,5 @@ public interface TimeLimitBuyAppService {
     List<MarketingCampaignVo> getForList(String cityCode);
     GoodInfoVo getGoodInfo(Long id);
     void remind(Long id);
+    void remindNotify(Long userId, Long goodsId);
 }

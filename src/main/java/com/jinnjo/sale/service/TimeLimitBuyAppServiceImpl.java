@@ -4,7 +4,9 @@ import com.jinnjo.sale.clients.BmsClient;
 import com.jinnjo.sale.clients.CampaignCilent;
 import com.jinnjo.sale.clients.GoodsClient;
 import com.jinnjo.sale.domain.GoodsSkuSqr;
+import com.jinnjo.sale.domain.TimeLimitRemind;
 import com.jinnjo.sale.domain.vo.*;
+import com.jinnjo.sale.mq.SaleProducer;
 import com.jinnjo.sale.repo.GoodsSkuSqrRepository;
 import com.jinnjo.sale.utils.SignatureUtil;
 import com.jinnjo.sale.utils.UserUtil;
@@ -14,6 +16,7 @@ import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,6 +53,9 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
         this.bmsClient = bmsClient;
         this.goodsClient = goodsClient;
     }
+
+    @Value("${sale.notify.url}")
+    private String notifyUrl;
 
     @Override
     public MarketingCampaignVo getForTop(String cityCode) {
@@ -184,6 +191,14 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
 
     @Override
     public void remind(Long id) {
+        //记录日志
+        TimeLimitRemind timeLimitRemind = new TimeLimitRemind();
+        bmsClient.sendDelayMsg(new OrderMsgText(5000, notifyUrl+"?userId="+UserUtil.getCurrentUserId()+"&goodsId="+id));
+    }
+
+    @Override
+    public void remindNotify(Long userId, Long id) {
+
         MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
         if(null == campaignVo)
             throw new ConstraintViolationException("当前商品没有设置限时购活动!", new HashSet<>());
