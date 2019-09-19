@@ -38,16 +38,14 @@ import java.util.*;
 @Slf4j
 public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     private final CampaignCilent campaignCilent;
-    private final GoodsSkuSqrRepository goodsSkuSqrRepository;
     private final BmsClient bmsClient;
     private final GoodsClient goodsClient;
+
     @Autowired
     public TimeLimitBuyAppServiceImpl(CampaignCilent campaignCilent,
-                                      GoodsSkuSqrRepository goodsSkuSqrRepository,
+                                      GoodsClient goodsClient,
                                       BmsClient bmsClient){
-    public TimeLimitBuyAppServiceImpl(CampaignCilent campaignCilent,GoodsClient goodsClient){
         this.campaignCilent = campaignCilent;
-        this.goodsSkuSqrRepository = goodsSkuSqrRepository;
         this.bmsClient = bmsClient;
         this.goodsClient = goodsClient;
     }
