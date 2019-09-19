@@ -42,23 +42,24 @@ public class TimeLimitBuyAppController {
 
     @ApiOperation(value = "首页限时购", notes = "首页限时购")
     @GetMapping(value = "/top",produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<MarketingCampaignVo> getForTop(){
+    public ResponseEntity<MarketingCampaignVo> getForTop(@RequestParam("cityCode")String cityCode){
         log.info("首页限时购");
-        return Optional.ofNullable(timeLimitBuyAppService.getForTop()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return Optional.ofNullable(timeLimitBuyAppService.getForTop(cityCode)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "限时购列表", notes = "限时购列表")
     @GetMapping(value = "/list",produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<List<MarketingCampaignVo>> getForList(){
+    public ResponseEntity<List<MarketingCampaignVo>> getForList(@RequestParam("cityCode")String cityCode){
         log.info("限时购列表");
-        return Optional.ofNullable(timeLimitBuyAppService.getForList()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return Optional.ofNullable(timeLimitBuyAppService.getForList(cityCode)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "限时购详情", notes = "限时购详情")
     @GetMapping(value = "/{id}",produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<Page<SeckillGoodsVo>> getById(@PathVariable("id")Long id,@RequestParam("page")Integer page,@RequestParam("size")Integer size){
+    public ResponseEntity<Page<SeckillGoodsVo>> getById(@PathVariable("id")Long id,@RequestParam("page")Integer page,
+                                                        @RequestParam("size")Integer size,@RequestParam("cityCode")String cityCode){
         log.info("限时购详情{}",id);
-        return Optional.ofNullable(timeLimitBuyAppService.getById(id,page,size)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return Optional.ofNullable(timeLimitBuyAppService.getById(id,page,size,cityCode)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "限时购商品详情", notes = "限时购商品详情")

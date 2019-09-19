@@ -2,11 +2,16 @@ package com.jinnjo.sale.service;
 
 import com.jinnjo.sale.clients.BmsClient;
 import com.jinnjo.sale.clients.CampaignCilent;
+import com.jinnjo.sale.clients.GoodsClient;
 import com.jinnjo.sale.domain.GoodsSkuSqr;
 import com.jinnjo.sale.domain.vo.*;
 import com.jinnjo.sale.repo.GoodsSkuSqrRepository;
 import com.jinnjo.sale.utils.SignatureUtil;
 import com.jinnjo.sale.utils.UserUtil;
+import com.jinnjo.sale.domain.vo.DiscountSeckillInfoVo;
+import com.jinnjo.sale.domain.vo.GoodInfoVo;
+import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
+import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolationException;
 import java.text.SimpleDateFormat;
@@ -34,18 +40,20 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     private final CampaignCilent campaignCilent;
     private final GoodsSkuSqrRepository goodsSkuSqrRepository;
     private final BmsClient bmsClient;
-
+    private final GoodsClient goodsClient;
     @Autowired
     public TimeLimitBuyAppServiceImpl(CampaignCilent campaignCilent,
                                       GoodsSkuSqrRepository goodsSkuSqrRepository,
                                       BmsClient bmsClient){
+    public TimeLimitBuyAppServiceImpl(CampaignCilent campaignCilent,GoodsClient goodsClient){
         this.campaignCilent = campaignCilent;
         this.goodsSkuSqrRepository = goodsSkuSqrRepository;
         this.bmsClient = bmsClient;
+        this.goodsClient = goodsClient;
     }
 
     @Override
-    public MarketingCampaignVo getForTop() {
+    public MarketingCampaignVo getForTop(String cityCode) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
         List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date);
@@ -64,6 +72,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     //当前时间在活动时间段内
                     List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
                     seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
                     if (seckillGoodsVoList.size()>2){
                         discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
                     }
@@ -78,6 +87,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     marketingCampaignVo.setInterval(interval);
                     List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
                     seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
                     if (seckillGoodsVoList.size()>2){
                         discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
                     }
@@ -88,6 +98,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     //当前时间在活动时间段之后
                     List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
                     seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
                     if (seckillGoodsVoList.size()>2){
                         discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
                     }
@@ -104,27 +115,30 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
 
     @Override
     @SuppressWarnings("all")
-    public Page<SeckillGoodsVo> getById(Long id,Integer page,Integer size) {
+    public Page<SeckillGoodsVo> getById(Long id,Integer page,Integer size,String cityCode) {
         Pageable pageable = PageRequest.of(page,size);
         MarketingCampaignVo marketingCampaignVo = campaignCilent.getCampaignById(id);
         List<SeckillGoodsVo> seckillGoodsVoList = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList();
-        List<Long> skuIdList = new ArrayList<>();
-        seckillGoodsVoList.forEach(seckillGoodsVo -> skuIdList.add(seckillGoodsVo.getGoodsSpecId()));
-        List<GoodsSkuSqr> goodsSkuSqrList = goodsSkuSqrRepository.findByIdIn(skuIdList);
-        seckillGoodsVoList.forEach(seckillGoodsVo -> {
+        seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
+        List<String> skuIdList = new ArrayList<>();
+        int total = seckillGoodsVoList.size();
+        List<SeckillGoodsVo> pageList = seckillGoodsVoList.subList(page*size,total<(page+1)*size?total:(page+1)*size);
+        pageList.forEach(seckillGoodsVo -> skuIdList.add(seckillGoodsVo.getGoodsSpecId().toString()));
+        String skuId = StringUtils.collectionToDelimitedString(skuIdList,",");
+        List<GoodsSkuSqr> goodsSkuSqrList = goodsClient.findGoodsSku(skuId);
+        pageList.forEach(seckillGoodsVo -> {
             goodsSkuSqrList.forEach(goodsSkuSqr -> {
                 if (seckillGoodsVo.getGoodsSpecId().equals(goodsSkuSqr.getId())){
                     seckillGoodsVo.setStock(goodsSkuSqr.getStock());
                 }
             });
         });
-        int total = seckillGoodsVoList.size();
-        Page<SeckillGoodsVo> seckillGoodsVoPage = new PageImpl(seckillGoodsVoList.subList(page*size,total<(page+1)*size?total:(page+1)*size),pageable,total);
+        Page<SeckillGoodsVo> seckillGoodsVoPage = new PageImpl(pageList,pageable,total);
         return seckillGoodsVoPage;
     }
 
     @Override
-    public List<MarketingCampaignVo> getForList() {
+    public List<MarketingCampaignVo> getForList(String cityCode) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
         List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date);
@@ -134,6 +148,8 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
         for (MarketingCampaignVo marketingCampaignVo:marketingCampaignVoList){
             DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfo();
             if (null!=discountSeckillInfoVo){
+                List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
+                seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
                 Date startTime = discountSeckillInfoVo.getStartSeckillTime();
                 Date endTime = discountSeckillInfoVo.getEndSeckillTime();
                 Date nowTime = new Date();
