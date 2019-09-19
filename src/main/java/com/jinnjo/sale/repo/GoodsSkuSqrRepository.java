@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface GoodsSkuSqrRepository extends JpaRepository<GoodsSkuSqr, Long>{
-    List<GoodsSkuSqr> findByIdIn(List<Long> idList);
 }

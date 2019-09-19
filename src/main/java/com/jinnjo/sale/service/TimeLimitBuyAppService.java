@@ -14,8 +14,8 @@ import java.util.List;
  * description:
  */
 public interface TimeLimitBuyAppService {
-    MarketingCampaignVo getForTop();
-    Page<SeckillGoodsVo> getById(Long id,Integer page,Integer size);
-    List<MarketingCampaignVo> getForList();
+    MarketingCampaignVo getForTop(String cityCode);
+    Page<SeckillGoodsVo> getById(Long id,Integer page,Integer size,String cityCode);
+    List<MarketingCampaignVo> getForList(String cityCode);
     GoodInfoVo getGoodInfo(Long id);
 }
