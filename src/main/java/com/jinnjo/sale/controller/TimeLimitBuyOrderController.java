@@ -31,7 +31,7 @@ public class TimeLimitBuyOrderController {
         this.timeLimitBuyOrderService = timeLimitBuyOrderService;
     }
 
-    @PreAuthorize("hasAuthority('SQR_ADMIN')")
+    @PreAuthorize("hasAuthority('SQR_USER')")
     @ApiOperation(value = "限时购商品下单", notes = "限时购商品下单")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<OrderUnifiedVo> addOrder(@Valid @RequestBody OrderSubmitVo orderSubmitVo){

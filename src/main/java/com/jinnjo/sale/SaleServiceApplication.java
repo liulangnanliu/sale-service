@@ -4,6 +4,7 @@ import com.jinnjo.base.config.SpringContextUtil;
 import com.jinnjo.base.config.WebMvcConfig;
 import com.jinnjo.base.security.CustomUserInfoTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

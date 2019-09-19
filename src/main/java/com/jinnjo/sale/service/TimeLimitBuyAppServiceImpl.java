@@ -1,12 +1,12 @@
 package com.jinnjo.sale.service;
 
+import com.jinnjo.sale.clients.BmsClient;
 import com.jinnjo.sale.clients.CampaignCilent;
 import com.jinnjo.sale.domain.GoodsSkuSqr;
-import com.jinnjo.sale.domain.vo.DiscountSeckillInfoVo;
-import com.jinnjo.sale.domain.vo.GoodInfoVo;
-import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
-import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
+import com.jinnjo.sale.domain.vo.*;
 import com.jinnjo.sale.repo.GoodsSkuSqrRepository;
+import com.jinnjo.sale.utils.SignatureUtil;
+import com.jinnjo.sale.utils.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import javax.validation.ConstraintViolationException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -30,12 +33,16 @@ import java.util.*;
 public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     private final CampaignCilent campaignCilent;
     private final GoodsSkuSqrRepository goodsSkuSqrRepository;
+    private final BmsClient bmsClient;
+
     @Autowired
-    public TimeLimitBuyAppServiceImpl(CampaignCilent campaignCilent,GoodsSkuSqrRepository goodsSkuSqrRepository){
+    public TimeLimitBuyAppServiceImpl(CampaignCilent campaignCilent,
+                                      GoodsSkuSqrRepository goodsSkuSqrRepository,
+                                      BmsClient bmsClient){
         this.campaignCilent = campaignCilent;
         this.goodsSkuSqrRepository = goodsSkuSqrRepository;
+        this.bmsClient = bmsClient;
     }
-
 
     @Override
     public MarketingCampaignVo getForTop() {
@@ -159,5 +166,34 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
 
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
         return new GoodInfoVo(campaignVo.getDiscountSeckillInfo(), seckillGoods);
+    }
+
+    @Override
+    public void remind(Long id) {
+        MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
+        if(null == campaignVo)
+            throw new ConstraintViolationException("当前商品没有设置限时购活动!", new HashSet<>());
+
+        SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
+
+        Date endSeckillTime = campaignVo.getDiscountSeckillInfo().getEndSeckillTime();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(endSeckillTime.toInstant(), ZoneId.systemDefault());
+
+        if(localDateTime.compareTo(LocalDateTime.now().plusMinutes(5)) < 0)
+            throw new ConstraintViolationException("准备好，抢购马上开始咯！", new HashSet<>());
+
+        GoodsTimelimitedVo goodsTimelimitedVo = new GoodsTimelimitedVo();
+        goodsTimelimitedVo.setContent("你关注的商品『" + seckillGoods.getGoodsName() + "』马上要开抢啦！");
+        Map map = new HashMap();
+        map.put("act", "miaosha");
+        map.put("id", id);
+        goodsTimelimitedVo.setExtras(map);
+        goodsTimelimitedVo.setPushtype(1);
+        goodsTimelimitedVo.setStartdate(localDateTime.minusMinutes(5).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        goodsTimelimitedVo.setType("member");
+        goodsTimelimitedVo.setUserid(UserUtil.getCurrentUserId());
+        goodsTimelimitedVo.setSign(SignatureUtil.signParams(goodsTimelimitedVo));
+        Map result = bmsClient.sendMsg(goodsTimelimitedVo);
+        log.info("限时购活动推送返回result:{}", result);
     }
 }

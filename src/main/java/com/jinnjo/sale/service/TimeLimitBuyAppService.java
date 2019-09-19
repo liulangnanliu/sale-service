@@ -6,6 +6,7 @@ import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -18,4 +19,5 @@ public interface TimeLimitBuyAppService {
     Page<SeckillGoodsVo> getById(Long id,Integer page,Integer size);
     List<MarketingCampaignVo> getForList();
     GoodInfoVo getGoodInfo(Long id);
+    void remind(Long id);
 }

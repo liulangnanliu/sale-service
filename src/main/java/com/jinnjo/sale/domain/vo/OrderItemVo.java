@@ -34,7 +34,7 @@ public class OrderItemVo {
 
     @NotNull
     @ApiModelProperty(value = "订单商品规格ID")
-    private String skuId;
+    private Long skuId;
 
     @ApiModelProperty(value = "类目id")
     private String categoryId;

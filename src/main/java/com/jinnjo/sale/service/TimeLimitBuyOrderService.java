@@ -101,7 +101,7 @@ public class TimeLimitBuyOrderService {
 
         orderItemVo.setPrice(goodsSkuSqr.getPrice());
         orderItemVo.setSpStrVal(goodsSkuSqr.getSpStrVal());
-        orderItemVo.setStock(goodsSkuSqr.getStock());
+        //orderItemVo.setStock(goodsSkuSqr.getStock());
 
         OrderUnifiedVo orderUnifiedVo = orderClient.limitTimeOrder(orderSubmitVo);
 

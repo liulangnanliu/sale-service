@@ -1,22 +1,28 @@
 package com.jinnjo.sale.controller;
 
+import com.jinnjo.base.annotations.Action;
+import com.jinnjo.base.util.UserUtil;
 import com.jinnjo.sale.domain.vo.GoodInfoVo;
 import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import com.jinnjo.sale.service.TimeLimitBuyAppService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author bobo
@@ -60,5 +66,16 @@ public class TimeLimitBuyAppController {
     public ResponseEntity<GoodInfoVo> getGoodInfo(@ApiParam(name = "id", value = "商品id", required = true) @RequestParam Long id){
         log.info("限时购商品详情id:{}", id);
         return Optional.ofNullable(timeLimitBuyAppService.getGoodInfo(id)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * 限时购开抢提醒
+     */
+    @PreAuthorize("hasAuthority('SQR_USER')")
+    @ApiOperation(value = "限时购活动开抢提醒", notes = "限时购活动开抢提醒")
+    @PostMapping(value = "/remind", produces = MediaTypes.HAL_JSON_VALUE)
+    public void remind(@ApiParam(name = "id", value = "商品ID", required = true) @RequestParam(name = "id") Long id){
+        log.info("限时提醒id:{}", id);
+        timeLimitBuyAppService.remind(id);
     }
 }

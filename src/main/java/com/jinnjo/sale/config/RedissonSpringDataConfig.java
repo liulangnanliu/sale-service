@@ -9,6 +9,7 @@ import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 @Configuration
@@ -28,11 +29,24 @@ public class RedissonSpringDataConfig {
     @Value("${spring.redis.jedis.pool.max-wait}")
     private int maxWaitMillis;
 
+    @Primary
+    @Bean(name = "redis0")
+    public StringRedisTemplate stringRedisTemplate0(RedissonClient redisson0){
+        StringRedisTemplate temple = new StringRedisTemplate();
+        temple.setConnectionFactory(new RedissonConnectionFactory(redisson0));
+        return temple;
+    }
+
     @Bean(name = "redis17")
     public StringRedisTemplate stringRedisTemplate17(RedissonClient redisson17){
         StringRedisTemplate temple = new StringRedisTemplate();
         temple.setConnectionFactory(new RedissonConnectionFactory(redisson17));
         return temple;
+    }
+
+    @Bean(destroyMethod = "shutdown")
+    public RedissonClient redisson0() {
+        return Redisson.create(configRedisson(0));
     }
 
     @Bean(destroyMethod = "shutdown")
