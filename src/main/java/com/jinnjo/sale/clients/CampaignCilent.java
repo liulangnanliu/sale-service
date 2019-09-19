@@ -49,7 +49,7 @@ public interface CampaignCilent {
     Long checkSeckillGoods(@RequestParam("date") String date, @RequestParam("goodsId") Long goodsId, @RequestParam("goodsSpecId") Long goodsSpecId);
 
     @PostMapping(value = "/campaigns/checkseckilltime", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
-    Long checkSeckillTime(@RequestParam("startSeckillTime") String startSeckillTime, @RequestParam("endSeckillTime") String endSeckillTime);
+    Long checkSeckillTime(@RequestParam("startSeckillTime") String startSeckillTime, @RequestParam("endSeckillTime") String endSeckillTime, @RequestParam("id") String id);
 
     @GetMapping(value = "/campaigns/checkseckillgoodslist", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     List<String> checkSeckillGoodsList(@RequestParam("date") String date, @RequestParam("goodsList") String goodsList);
