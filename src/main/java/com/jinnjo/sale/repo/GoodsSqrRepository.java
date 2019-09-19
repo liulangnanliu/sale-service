@@ -11,10 +11,8 @@ import java.util.List;
 
 @Repository
 public interface GoodsSqrRepository extends JpaRepository<GoodsSqr, Long>{
-
-    @Query(value = "select id from jz_goods_info_sqr where id in (?1)", nativeQuery = true)
-    List<BigInteger> queryAllByIdNotIn(Collection<Long> ids);
+    List<GoodsSqr> queryAllByIdIn(Collection<Long> ids);
 
 
-    GoodsSqr findByIdAndStatusIsNot(Long id, Short status);
+    GoodsSqr findByIdAndStatus(Long id, Integer status);
 }

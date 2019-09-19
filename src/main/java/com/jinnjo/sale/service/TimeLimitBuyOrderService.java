@@ -72,17 +72,24 @@ public class TimeLimitBuyOrderService {
             throw new ConstraintViolationException("限时购活动已结束，价格发生变动，请重新下单!", new HashSet<>());
 
         //校验用户的限购数量
-        String buyCount = stringRedisTemplate17.opsForValue().get("timeLimitUser" + UserUtil.getCurrentUserId());
-        if(StringUtil.isNotEmpty(buyCount) && (Integer.parseInt(buyCount) + orderItemVo.getGoodsCount()) > seckillGoods.getLimitCount())
-            throw new ConstraintViolationException("用户今天累计购买数量已经超过限时购商品限购数量!", new HashSet<>());
+
+        String buyCount = null;
+        if(null != seckillGoods.getLimitCount()){ //null为不限购
+            buyCount = stringRedisTemplate17.opsForValue().get("timeLimitUser" + UserUtil.getCurrentUserId() + "_" + orderItemVo.getGoodsId());
+            if(StringUtil.isNotEmpty(buyCount) && (Integer.parseInt(buyCount) + orderItemVo.getGoodsCount()) > seckillGoods.getLimitCount())
+                throw new ConstraintViolationException("用户今天累计购买数量已经超过限时购商品限购数量!", new HashSet<>());
+        }
 
         orderItemVo.setDiscountPrice(seckillGoods.getSeckillPrice()); //商品折扣价设置为秒杀价格
-        GoodsSqr goodsSqr = goodsSqrRepository.findByIdAndStatusIsNot(orderItemVo.getGoodsId(), Short.valueOf("-1"));
+        GoodsSqr goodsSqr = goodsSqrRepository.findByIdAndStatus(orderItemVo.getGoodsId(), 3);
+        if(null == goodsSqr)
+            throw new ConstraintViolationException("商品被删除或下架!", new HashSet<>());
+
         orderItemVo.setType(goodsSqr.getType());
         orderItemVo.setBuyType(goodsSqr.getBuyType());
         orderItemVo.setExpenses(goodsSqr.getExpenses());
         orderItemVo.setExpensesTaxation(goodsSqr.getExpensesTaxation());
-        orderItemVo.setIsCertification(Integer.parseInt(goodsSqr.getIsCertification()));
+        orderItemVo.setIsCertification(StringUtil.isEmpty(goodsSqr.getIsCertification()) ? null : Integer.parseInt(goodsSqr.getIsCertification()));
         orderItemVo.setPlatformCharge(goodsSqr.getPlatformCharge());
         orderItemVo.setTsfGoodsId(String.valueOf(goodsSqr.getTsfGoodsId()));
         orderItemVo.setDistributionType(goodsSqr.getDistributionType());
@@ -94,7 +101,6 @@ public class TimeLimitBuyOrderService {
         orderItemVo.setIcon(goodsSqr.getIcon());
         orderItemVo.setSource(goodsSqr.getSource());
 
-
         GoodsSkuSqr goodsSkuSqr = goodsSqr.getSkuInfos().stream().filter(skuInfo -> skuInfo.getId().equals(orderItemVo.getSkuId())).findFirst().orElse(null);
         if(null == goodsSkuSqr)
             throw new ConstraintViolationException(orderItemVo.getSkuId() + "规格不存在!", new HashSet<>());
@@ -105,8 +111,10 @@ public class TimeLimitBuyOrderService {
 
         OrderUnifiedVo orderUnifiedVo = orderClient.limitTimeOrder(orderSubmitVo);
 
-        buyCount = (orderItemVo.getGoodsCount() + (StringUtil.isEmpty(buyCount) ? 0 : Integer.parseInt(buyCount))) + "";
-        stringRedisTemplate17.opsForValue().set("timeLimitUser" + UserUtil.getCurrentUserId(), buyCount, ChronoUnit.SECONDS.between(LocalDateTime.now(), LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)), TimeUnit.SECONDS);
+        if(null != seckillGoods.getLimitCount()) {
+            buyCount = (orderItemVo.getGoodsCount() + (StringUtil.isEmpty(buyCount) ? 0 : Integer.parseInt(buyCount))) + "";
+            stringRedisTemplate17.opsForValue().set("timeLimitUser" + UserUtil.getCurrentUserId() + "_" + orderItemVo.getGoodsId(), buyCount, ChronoUnit.SECONDS.between(LocalDateTime.now(), LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)), TimeUnit.SECONDS);
+        }
         return orderUnifiedVo;
     }
 

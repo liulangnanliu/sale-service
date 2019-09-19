@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotEmpty;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -68,8 +67,7 @@ public class TimeLimitBuyService {
         if(seckillGoodsList.size() > 0)
             throw new ConstraintViolationException("新增的限时购活动商品"+seckillGoodsList.stream().collect(Collectors.joining(","))+"已存在!", new HashSet<>());
 
-        //保存商品信息到本地
-        saveGoodsInfo(marketingCampaignVo);
+        saveAndValidateGoodsInfo(marketingCampaignVo);
 
         String campaignsId = campaignCilent.addCampaigns(marketingCampaignVo);
 
@@ -82,20 +80,46 @@ public class TimeLimitBuyService {
 
     }
 
-    private void saveGoodsInfo(MarketingCampaignVo marketingCampaignVo){
+    private List<GoodsSqr> saveAndValidateGoodsInfo(MarketingCampaignVo marketingCampaignVo){
+        //保存商品信息到本地
+        List<GoodsSqr> goodsSqrs = saveGoodsInfo(marketingCampaignVo);
+
+        //校验商品的价格
+        String goodsName = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> {
+            return goodsSqrs.stream().flatMap(goodsSqr -> goodsSqr.getSkuInfos().stream()).anyMatch(goodsSkuSqr -> {
+                if(goodsSkuSqr.getId().equals(seckillGoodsVo.getGoodsSpecId())) {
+                    if (null != goodsSkuSqr.getDiscountPrice()) {
+                        return (seckillGoodsVo.getSeckillPrice().compareTo(goodsSkuSqr.getDiscountPrice()) >= 0) ? true : false;
+                    } else {
+                        return (seckillGoodsVo.getSeckillPrice().compareTo(goodsSkuSqr.getPrice()) >= 0) ? true : false;
+                    }
+                }
+                return false;
+            });
+        }).map(seckillGoodsVo -> seckillGoodsVo.getGoodsName()).collect(Collectors.joining(","));
+        if(StringUtil.isNotEmpty(goodsName))
+            throw new ConstraintViolationException("新增的限时购活动商品"+goodsName+"价格不能大于原先价格!", new HashSet<>());
+
+        return goodsSqrs;
+    }
+
+    private List<GoodsSqr> saveGoodsInfo(MarketingCampaignVo marketingCampaignVo){
         List<SeckillGoodsVo> seckillGoodsList = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList();
 
         //查询已存在的商品实例id
-        List<String> localGoodIds = goodsSqrRepository.queryAllByIdNotIn(seckillGoodsList.stream().map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList())).stream().map(t -> t.toString()).collect(Collectors.toList());
+        List<GoodsSqr> goodsSqrList = goodsSqrRepository.queryAllByIdIn(seckillGoodsList.stream().map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList()));
+        List<String> localGoodIds = goodsSqrList.stream().map(t -> t.getId().toString()).collect(Collectors.toList());
 
         //查询商品信息
         String goodIds = seckillGoodsList.stream().map(seckillGoodsVo -> String.valueOf(seckillGoodsVo.getGoodsId())).filter(t -> !localGoodIds.contains(t)).collect(Collectors.joining(","));
 
         if(StringUtil.isEmpty(goodIds))
-            return;
+            return goodsSqrList;
 
         Collection<GoodsSqr> goods = goodsClient.findGoods(seckillGoodsList.size(), "id::" + goodIds).getContent();
-        goodsSqrRepository.saveAll(goods);
+        List<GoodsSqr> goodsSqrs = goodsSqrRepository.saveAll(goods);
+        goodsSqrList.addAll(goodsSqrs);
+        return goodsSqrList;
     }
 
     public void update(MarketingCampaignVo marketingCampaignVo){
@@ -126,6 +150,8 @@ public class TimeLimitBuyService {
                     throw new ConstraintViolationException("修改的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
             }
         }
+
+        saveAndValidateGoodsInfo(marketingCampaignVo);
 
         //校验商品
         List<Long> targetGoodsIds = target.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList());
