@@ -104,7 +104,7 @@ public class TimeLimitBuyOrderService {
         if(null == goodsSkuSqr)
             throw new ConstraintViolationException(orderItemVo.getSkuId() + "规格不存在!", new HashSet<>());
 
-        orderItemVo.setPrice(goodsSkuSqr.getPrice());
+        orderItemVo.setPrice(goodsSkuSqr.getDiscountPrice());
         orderItemVo.setSpStrVal(goodsSkuSqr.getSpStrVal());
         //orderItemVo.setStock(goodsSkuSqr.getStock());
 
