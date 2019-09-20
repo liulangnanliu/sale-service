@@ -6,8 +6,10 @@ import com.jinnjo.sale.clients.GoodsClient;
 import com.jinnjo.sale.domain.GoodsSkuSqr;
 import com.jinnjo.sale.domain.TimeLimitRemind;
 import com.jinnjo.sale.domain.vo.*;
+import com.jinnjo.sale.enums.StatusEnum;
 import com.jinnjo.sale.mq.SaleProducer;
 import com.jinnjo.sale.repo.GoodsSkuSqrRepository;
+import com.jinnjo.sale.repo.TimeLimitRemindRepository;
 import com.jinnjo.sale.utils.SignatureUtil;
 import com.jinnjo.sale.utils.UserUtil;
 import com.jinnjo.sale.domain.vo.DiscountSeckillInfoVo;
@@ -44,14 +46,17 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     private final CampaignCilent campaignCilent;
     private final BmsClient bmsClient;
     private final GoodsClient goodsClient;
+    private final TimeLimitRemindRepository timeLimitRemindRepository;
 
     @Autowired
     public TimeLimitBuyAppServiceImpl(CampaignCilent campaignCilent,
                                       GoodsClient goodsClient,
-                                      BmsClient bmsClient){
+                                      BmsClient bmsClient,
+                                      TimeLimitRemindRepository timeLimitRemindRepository){
         this.campaignCilent = campaignCilent;
         this.bmsClient = bmsClient;
         this.goodsClient = goodsClient;
+        this.timeLimitRemindRepository = timeLimitRemindRepository;
     }
 
     @Value("${sale.notify.url}")
@@ -192,10 +197,25 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     }
 
     @Override
-    public void remind(Long id) {
-        //记录日志
-        TimeLimitRemind timeLimitRemind = new TimeLimitRemind();
-        bmsClient.sendDelayMsg(new OrderMsgText(5000, notifyUrl+"?userId="+UserUtil.getCurrentUserId()+"&goodsId="+id));
+    public void remind(Long id,Date activityTime,Integer status) {
+        if (status.equals(StatusEnum.NORMAL.getCode())){
+            //设置提醒
+            TimeLimitRemind timeLimitRemind = new TimeLimitRemind();
+            timeLimitRemind.setGoodsId(id);
+            timeLimitRemind.setUserId(UserUtil.getCurrentUserId());
+            timeLimitRemind.setStatus(StatusEnum.NORMAL.getCode());
+            timeLimitRemind.setActivityTime(activityTime);
+            timeLimitRemindRepository.save(timeLimitRemind);
+        }else {
+            //取消提醒
+            TimeLimitRemind timeLimitRemind = timeLimitRemindRepository.findByUserIdAndActivityTimeAndGoodsIdAndStatus(UserUtil.getCurrentUserId(),activityTime,id,StatusEnum.NORMAL.getCode());
+            if (null==timeLimitRemind){
+                throw new ConstraintViolationException("未找到提醒", new HashSet<>());
+            }
+            timeLimitRemind.setStatus(StatusEnum.DELETE.getCode());
+            timeLimitRemindRepository.save(timeLimitRemind);
+        }
+//        bmsClient.sendDelayMsg(new OrderMsgText(5000, notifyUrl+"?userId="+UserUtil.getCurrentUserId()+"&goodsId="+id));
     }
 
     @Override

@@ -9,9 +9,9 @@ import lombok.Getter;
  */
 @Getter
 public enum StatusEnum implements CodeEnum{
-    DELETE(0, "删除"),
+    DELETE(-1, "删除"),
 
-    NORMAL(1, "正常");
+    NORMAL(0, "正常");
     private Integer code;
     private String description;
 

@@ -75,15 +75,20 @@ public class TimeLimitBuyAppController {
     @PreAuthorize("hasAuthority('SQR_USER')")
     @ApiOperation(value = "限时购活动开抢提醒", notes = "限时购活动开抢提醒")
     @PostMapping(value = "/remind", produces = MediaTypes.HAL_JSON_VALUE)
-    public void remind(@ApiParam(name = "id", value = "商品ID", required = true) @RequestParam(name = "id") Long id){
-        log.info("限时提醒id:{}", id);
-        timeLimitBuyAppService.remind(id);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id",value = "商品id" ,required = true, dataType = "long", paramType = "query"),
+            @ApiImplicitParam(name = "activityTime",value = "活动开始时间" ,required = true, dataType = "date", paramType = "query"),
+            @ApiImplicitParam(name = "status",value = "0 设置 -1取消" ,required = true, dataType = "int", paramType = "query")
+    })
+    public void remind(@RequestParam(name = "id") Long id,@RequestParam("activityTime") Date activityTime,@RequestParam("status") Integer status){
+        log.info("限时提醒id:{}开始时间{}状态{}", id,activityTime.toString(),status);
+        timeLimitBuyAppService.remind(id,activityTime,status);
     }
 
-    @ApiOperation(value = "延迟回调", notes = "延迟回调")
-    @GetMapping(value = "/notify")
-    public void remindNotify(@RequestParam String userId, @RequestParam String goodsId){
-        log.info("延迟回调userId:{} goodsId:{}", userId, goodsId);
-        timeLimitBuyAppService.remindNotify(Long.parseLong(userId), Long.parseLong(goodsId));
-    }
+//    @ApiOperation(value = "延迟回调", notes = "延迟回调")
+//    @GetMapping(value = "/notify")
+//    public void remindNotify(@RequestParam String userId, @RequestParam String goodsId){
+//        log.info("延迟回调userId:{} goodsId:{}", userId, goodsId);
+//        timeLimitBuyAppService.remindNotify(Long.parseLong(userId), Long.parseLong(goodsId));
+//    }
 }

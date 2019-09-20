@@ -44,6 +44,6 @@ public class TimeLimitRemind implements Identifiable<Long> {
     @ApiModelProperty(value = "商品ID", name = "goodsId")
     private Long goodsId;
 
-    @ApiModelProperty(value = "活动时间", name = "activityTime")
-    private LocalDate activityTime;
+    @ApiModelProperty(value = "活动开始时间", name = "activityTime")
+    private Date activityTime;
 }

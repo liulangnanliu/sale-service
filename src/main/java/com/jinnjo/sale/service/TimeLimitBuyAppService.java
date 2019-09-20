@@ -5,6 +5,7 @@ import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import org.springframework.data.domain.Page;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,6 @@ public interface TimeLimitBuyAppService {
     Page<SeckillGoodsVo> getById(Long id,Integer page,Integer size,String cityCode);
     List<MarketingCampaignVo> getForList(String cityCode);
     GoodInfoVo getGoodInfo(Long id);
-    void remind(Long id);
+    void remind(Long id, Date activityTime,Integer status);
     void remindNotify(Long userId, Long goodsId);
 }
