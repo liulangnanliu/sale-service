@@ -225,7 +225,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
 
     @Override
     public void remind(Long id,String activityTime,Integer status) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm;ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Date time;
         try {
             time = simpleDateFormat.parse(activityTime);
