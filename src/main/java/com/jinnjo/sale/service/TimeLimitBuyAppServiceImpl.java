@@ -292,7 +292,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
         goodsTimelimitedVo.setPushtype(1);
         goodsTimelimitedVo.setStartdate(localDateTime.minusMinutes(5).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         goodsTimelimitedVo.setType("member");
-        goodsTimelimitedVo.setUserid(UserUtil.getCurrentUserId());
+        goodsTimelimitedVo.setUserid(userId);
         goodsTimelimitedVo.setSign(SignatureUtil.signParams(goodsTimelimitedVo));
         Map result = bmsClient.sendMsg(goodsTimelimitedVo);
         log.info("限时购活动推送返回result:{}", result);
