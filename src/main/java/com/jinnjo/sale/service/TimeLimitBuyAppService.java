@@ -20,6 +20,6 @@ public interface TimeLimitBuyAppService {
     Page<SeckillGoodsVo> getById(Long id,Integer page,Integer size,String cityCode);
     List<MarketingCampaignVo> getForList(String cityCode);
     GoodInfoVo getGoodInfo(Long id);
-    void remind(Long id, String activityTime,Integer status);
+    Map<String,Object> remind(Long id, String activityTime,Integer status);
     void remindNotify(Long userId, Long goodsId);
 }

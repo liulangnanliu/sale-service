@@ -80,9 +80,9 @@ public class TimeLimitBuyAppController {
             @ApiImplicitParam(name = "activityTime",value = "活动开始时间" ,required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "status",value = "0 设置 -1取消" ,required = true, dataType = "int", paramType = "query")
     })
-    public void remind(@RequestParam(name = "id") Long id,@RequestParam("activityTime") String activityTime,@RequestParam("status") Integer status){
+    public Map<String,Object> remind(@RequestParam(name = "id") Long id,@RequestParam("activityTime") String activityTime,@RequestParam("status") Integer status){
         log.info("限时提醒id:{}开始时间{}状态{}", id,activityTime,status);
-        timeLimitBuyAppService.remind(id,activityTime,status);
+        return timeLimitBuyAppService.remind(id,activityTime,status);
     }
 
 //    @ApiOperation(value = "延迟回调", notes = "延迟回调")

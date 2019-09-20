@@ -224,7 +224,8 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     }
 
     @Override
-    public void remind(Long id,String activityTime,Integer status) {
+    public Map<String,Object> remind(Long id,String activityTime,Integer status) {
+        Map<String,Object> map = new HashMap<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Date time;
         try {
@@ -235,12 +236,24 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
         }
         if (status.equals(StatusEnum.NORMAL.getCode())){
             //设置提醒
-            TimeLimitRemind timeLimitRemind = new TimeLimitRemind();
-            timeLimitRemind.setGoodsId(id);
-            timeLimitRemind.setUserId(UserUtil.getCurrentUserId());
-            timeLimitRemind.setStatus(StatusEnum.NORMAL.getCode());
-            timeLimitRemind.setActivityTime(time);
-            timeLimitRemindRepository.save(timeLimitRemind);
+            Date date = new Date(new Date().getTime()+300000L);
+            if (date.after(time)){
+                map.put("message","准备好，抢购马上开始了！");
+            }else {
+                TimeLimitRemind timeLimitRemind = timeLimitRemindRepository.findByUserIdAndActivityTimeAndGoodsIdAndStatus(UserUtil.getCurrentUserId(),time,id,StatusEnum.DELETE.getCode());
+                if (null==timeLimitRemind){
+                    TimeLimitRemind newTimeLimitRemind = new TimeLimitRemind();
+                    newTimeLimitRemind.setGoodsId(id);
+                    newTimeLimitRemind.setUserId(UserUtil.getCurrentUserId());
+                    newTimeLimitRemind.setStatus(StatusEnum.NORMAL.getCode());
+                    newTimeLimitRemind.setActivityTime(time);
+                    timeLimitRemindRepository.save(newTimeLimitRemind);
+                }else {
+                    timeLimitRemind.setStatus(StatusEnum.NORMAL.getCode());
+                    timeLimitRemindRepository.save(timeLimitRemind);
+                }
+                map.put("message","已订阅开抢提醒，将在开抢前5分钟进行提醒");
+            }
         }else {
             //取消提醒
             TimeLimitRemind timeLimitRemind = timeLimitRemindRepository.findByUserIdAndActivityTimeAndGoodsIdAndStatus(UserUtil.getCurrentUserId(),time,id,StatusEnum.NORMAL.getCode());
@@ -249,7 +262,9 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             }
             timeLimitRemind.setStatus(StatusEnum.DELETE.getCode());
             timeLimitRemindRepository.save(timeLimitRemind);
+            map.put("message","已取消开抢提醒");
         }
+        return map;
 //        bmsClient.sendDelayMsg(new OrderMsgText(5000, notifyUrl+"?userId="+UserUtil.getCurrentUserId()+"&goodsId="+id));
     }
 
