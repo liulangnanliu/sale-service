@@ -97,6 +97,16 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
                     seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
                     seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
+                    if (null!=UserUtil.getCurrentUserId()){
+                        List<TimeLimitRemind> timeLimitReminds = timeLimitRemindRepository.findByUserIdAndStatus(UserUtil.getCurrentUserId(),StatusEnum.NORMAL.getCode());
+                        seckillGoodsVoList.forEach(seckillGoodsVo -> {
+                            timeLimitReminds.forEach(timeLimitRemind -> {
+                                if (seckillGoodsVo.getGoodsId().equals(timeLimitRemind.getGoodsId())){
+                                    seckillGoodsVo.setRemind(1);
+                                }
+                            });
+                        });
+                    }
                     if (seckillGoodsVoList.size()>2){
                         discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
                     }
@@ -143,7 +153,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             });
         });
         if (null!=UserUtil.getCurrentUserId()){
-            List<TimeLimitRemind> timeLimitRemindList = timeLimitRemindRepository.findByUserId(UserUtil.getCurrentUserId());
+            List<TimeLimitRemind> timeLimitRemindList = timeLimitRemindRepository.findByUserIdAndStatus(UserUtil.getCurrentUserId(),StatusEnum.NORMAL.getCode());
             pageList.forEach(seckillGoodsVo -> {
                 timeLimitRemindList.forEach(timeLimitRemind -> {
                     if (seckillGoodsVo.getGoodsId().equals(timeLimitRemind.getGoodsId())){
