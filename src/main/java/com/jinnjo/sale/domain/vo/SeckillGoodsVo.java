@@ -48,4 +48,7 @@ public class SeckillGoodsVo {
 
     @ApiModelProperty(value = "折扣价")
     private BigDecimal discountPrice;
+
+    @ApiModelProperty(value = "开抢提醒0不提醒 1提醒")
+    private Integer remind = 0;
 }

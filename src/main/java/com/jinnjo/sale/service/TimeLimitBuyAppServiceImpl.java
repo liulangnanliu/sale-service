@@ -143,6 +143,16 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                 }
             });
         });
+        if (null!=UserUtil.getCurrentUserId()){
+            List<TimeLimitRemind> timeLimitRemindList = timeLimitRemindRepository.findByUserId(UserUtil.getCurrentUserId());
+            pageList.forEach(seckillGoodsVo -> {
+                timeLimitRemindList.forEach(timeLimitRemind -> {
+                    if (seckillGoodsVo.getGoodsId().equals(timeLimitRemind.getGoodsId())){
+                        seckillGoodsVo.setRemind(1);
+                    }
+                });
+            });
+        }
         Page<SeckillGoodsVo> seckillGoodsVoPage = new PageImpl(pageList,pageable,total);
         return seckillGoodsVoPage;
     }
