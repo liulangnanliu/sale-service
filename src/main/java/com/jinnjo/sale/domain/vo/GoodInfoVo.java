@@ -31,6 +31,10 @@ public class GoodInfoVo {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long skuId;
 
+    @ApiModelProperty(value = "活动id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long marketingId;
+
     @ApiModelProperty(value = "规格名称")
     private String skuName;
 
@@ -44,7 +48,7 @@ public class GoodInfoVo {
 
     }
 
-    public GoodInfoVo(DiscountSeckillInfoVo discountSeckillInfo, SeckillGoodsVo seckillGoodsVo){
+    public GoodInfoVo(DiscountSeckillInfoVo discountSeckillInfo, SeckillGoodsVo seckillGoodsVo,String marketingId){
         this.setStartSeckillTime(discountSeckillInfo.getStartSeckillTime());
         this.setEndSeckillTime(discountSeckillInfo.getEndSeckillTime());
         this.setGoodsId(seckillGoodsVo.getGoodsId());
@@ -52,5 +56,6 @@ public class GoodInfoVo {
         this.setSkuName(seckillGoodsVo.getGoodsSpecName());
         this.setLimitCount(seckillGoodsVo.getLimitCount());
         this.setSeckillPrice(seckillGoodsVo.getSeckillPrice());
+        this.setMarketingId(Long.valueOf(marketingId));
     }
 }

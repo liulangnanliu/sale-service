@@ -186,7 +186,9 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             throw new ConstraintViolationException("当前商品没有设置限时购活动!", new HashSet<>());
 
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
-        return new GoodInfoVo(campaignVo.getDiscountSeckillInfo(), seckillGoods);
+        if(null == seckillGoods)
+            throw new ConstraintViolationException("当前商品不存在!", new HashSet<>());
+        return new GoodInfoVo(campaignVo.getDiscountSeckillInfo(), seckillGoods,campaignVo.getId());
     }
 
     @Override
