@@ -27,6 +27,10 @@ public class TimeLimitRemindServiceImpl implements TimeLimitRemindService{
     public void job() {
         Date date = new Date(new Date().getTime()+300000L);
         List<TimeLimitRemind> timeLimitRemindList = timeLimitRemindRepository.findByStatusAndActivityTimeLessThanEqual(StatusEnum.NORMAL.getCode(),date);
-        timeLimitRemindList.forEach(timeLimitRemind ->timeLimitBuyAppService.remindNotify(timeLimitRemind.getUserId(),timeLimitRemind.getGoodsId()));
+        timeLimitRemindList.forEach(timeLimitRemind ->{
+            timeLimitBuyAppService.remindNotify(timeLimitRemind.getUserId(),timeLimitRemind.getGoodsId());
+            timeLimitRemind.setStatus(StatusEnum.DELETE.getCode());
+        });
+        timeLimitRemindRepository.saveAll(timeLimitRemindList);
     }
 }
