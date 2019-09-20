@@ -7,8 +7,6 @@ import com.jinnjo.sale.domain.GoodsSkuSqr;
 import com.jinnjo.sale.domain.TimeLimitRemind;
 import com.jinnjo.sale.domain.vo.*;
 import com.jinnjo.sale.enums.StatusEnum;
-import com.jinnjo.sale.mq.SaleProducer;
-import com.jinnjo.sale.repo.GoodsSkuSqrRepository;
 import com.jinnjo.sale.repo.TimeLimitRemindRepository;
 import com.jinnjo.sale.utils.SignatureUtil;
 import com.jinnjo.sale.utils.UserUtil;
@@ -28,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -201,24 +200,40 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             throw new ConstraintViolationException("当前商品没有设置限时购活动!", new HashSet<>());
 
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
-        if(null == seckillGoods)
+        if(null == seckillGoods){
             throw new ConstraintViolationException("当前商品不存在!", new HashSet<>());
-        return new GoodInfoVo(campaignVo.getDiscountSeckillInfo(), seckillGoods,campaignVo.getId());
+        }
+        Integer remind = 0;
+        if (null!=UserUtil.getCurrentUserId()){
+            TimeLimitRemind timeLimitRemind = timeLimitRemindRepository.findByUserIdAndGoodsIdAndStatus(UserUtil.getCurrentUserId(),id,StatusEnum.NORMAL.getCode());
+            if (null!=timeLimitRemind){
+                remind = 1;
+            }
+        }
+        return new GoodInfoVo(campaignVo.getDiscountSeckillInfo(), seckillGoods,campaignVo.getId(),remind);
     }
 
     @Override
-    public void remind(Long id,Date activityTime,Integer status) {
+    public void remind(Long id,String activityTime,Integer status) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm;ss");
+        Date time;
+        try {
+            time = simpleDateFormat.parse(activityTime);
+        } catch (ParseException e) {
+            log.error("时间转换异常{}",e.getMessage());
+            throw new ConstraintViolationException("时间转换异常",new HashSet<>());
+        }
         if (status.equals(StatusEnum.NORMAL.getCode())){
             //设置提醒
             TimeLimitRemind timeLimitRemind = new TimeLimitRemind();
             timeLimitRemind.setGoodsId(id);
             timeLimitRemind.setUserId(UserUtil.getCurrentUserId());
             timeLimitRemind.setStatus(StatusEnum.NORMAL.getCode());
-            timeLimitRemind.setActivityTime(activityTime);
+            timeLimitRemind.setActivityTime(time);
             timeLimitRemindRepository.save(timeLimitRemind);
         }else {
             //取消提醒
-            TimeLimitRemind timeLimitRemind = timeLimitRemindRepository.findByUserIdAndActivityTimeAndGoodsIdAndStatus(UserUtil.getCurrentUserId(),activityTime,id,StatusEnum.NORMAL.getCode());
+            TimeLimitRemind timeLimitRemind = timeLimitRemindRepository.findByUserIdAndActivityTimeAndGoodsIdAndStatus(UserUtil.getCurrentUserId(),time,id,StatusEnum.NORMAL.getCode());
             if (null==timeLimitRemind){
                 throw new ConstraintViolationException("未找到提醒", new HashSet<>());
             }

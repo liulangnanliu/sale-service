@@ -12,4 +12,5 @@ public interface TimeLimitRemindRepository extends JpaRepository<TimeLimitRemind
     TimeLimitRemind findByUserIdAndActivityTimeAndGoodsIdAndStatus(Long userId, Date activityTime,Long goodsId,Integer status);
     List<TimeLimitRemind> findByStatusAndActivityTimeLessThanEqual(Integer status,Date now);
     List<TimeLimitRemind> findByUserId(Long userId);
+    TimeLimitRemind findByUserIdAndGoodsIdAndStatus(Long userId,Long goodsId,Integer status);
 }

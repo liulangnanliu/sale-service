@@ -44,11 +44,14 @@ public class GoodInfoVo {
     @ApiModelProperty(value = "秒杀价格")
     private BigDecimal seckillPrice;
 
+    @ApiModelProperty(value = "开抢提醒0不提醒 1提醒")
+    private Integer remind = 0;
+
     public GoodInfoVo(){
 
     }
 
-    public GoodInfoVo(DiscountSeckillInfoVo discountSeckillInfo, SeckillGoodsVo seckillGoodsVo,String marketingId){
+    public GoodInfoVo(DiscountSeckillInfoVo discountSeckillInfo, SeckillGoodsVo seckillGoodsVo,String marketingId,Integer remind){
         this.setStartSeckillTime(discountSeckillInfo.getStartSeckillTime());
         this.setEndSeckillTime(discountSeckillInfo.getEndSeckillTime());
         this.setGoodsId(seckillGoodsVo.getGoodsId());
@@ -57,5 +60,6 @@ public class GoodInfoVo {
         this.setLimitCount(seckillGoodsVo.getLimitCount());
         this.setSeckillPrice(seckillGoodsVo.getSeckillPrice());
         this.setMarketingId(Long.valueOf(marketingId));
+        this.setRemind(remind);
     }
 }
