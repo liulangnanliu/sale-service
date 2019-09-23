@@ -66,8 +66,8 @@ public class TimeLimitBuyOrderService {
             return orderClient.orders(orderSubmitVo);
 
         //校验当前的时间是否是限时购活动时间
-//        if(new Date().getTime() < campaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime() || new Date().getTime() > campaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
-//            return orderClient.orders(orderSubmitVo);
+        if(new Date().getTime() < campaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime() || new Date().getTime() > campaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
+            return orderClient.orders(orderSubmitVo);
 
         //校验用户的限购数量
         String buyCount = null;
