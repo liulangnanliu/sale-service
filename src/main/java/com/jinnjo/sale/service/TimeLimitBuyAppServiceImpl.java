@@ -235,6 +235,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             //设置提醒
             Date date = new Date(new Date().getTime()+300000L);
             if (date.after(time)){
+                map.put("type",0);
                 map.put("message","准备好，抢购马上开始了！");
             }else {
                 TimeLimitRemind timeLimitRemind = timeLimitRemindRepository.findByUserIdAndActivityTimeAndGoodsIdAndStatus(UserUtil.getCurrentUserId(),time,id,StatusEnum.DELETE.getCode());
@@ -249,6 +250,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     timeLimitRemind.setStatus(StatusEnum.NORMAL.getCode());
                     timeLimitRemindRepository.save(timeLimitRemind);
                 }
+                map.put("type",1);
                 map.put("message","已订阅开抢提醒，将在开抢前5分钟进行提醒");
             }
         }else {
@@ -259,6 +261,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             }
             timeLimitRemind.setStatus(StatusEnum.DELETE.getCode());
             timeLimitRemindRepository.save(timeLimitRemind);
+            map.put("type",1);
             map.put("message","已取消开抢提醒");
         }
         return map;
