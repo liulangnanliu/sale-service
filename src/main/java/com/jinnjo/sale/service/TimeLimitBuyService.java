@@ -52,20 +52,25 @@ public class TimeLimitBuyService {
         if(null == marketingCampaignVo)
             throw new ConstraintViolationException("新增的限时购活动不能为空!", new HashSet<>());
         Date startSeckillTime = marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime();
-        if(null == startSeckillTime)
+        Date endSeckillTime = marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime();
+        if(null == startSeckillTime || null == endSeckillTime)
             throw new ConstraintViolationException("新增的限时购活动时间不能为空!", new HashSet<>());
 
+        if(startSeckillTime.compareTo(endSeckillTime) >= 0)
+            throw new ConstraintViolationException("新增的限时购活动开始时间不能大于结束时间!", new HashSet<>());
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime()), null);
+        Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(endSeckillTime), null);
         if(timeFlag == 1)
             throw new ConstraintViolationException("新增的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
 
-        LocalDate seckillTime = LocalDateTime.ofInstant(marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime().toInstant(), ZoneId.systemDefault()).toLocalDate();
+        LocalDate seckillTime = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
 
         String goodsIds = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> String.valueOf(seckillGoodsVo.getGoodsId())).collect(Collectors.joining(","));
         List<String> seckillGoodsList = campaignCilent.checkSeckillGoodsList(seckillTime.toString(), goodsIds);
         if(seckillGoodsList.size() > 0)
             throw new ConstraintViolationException("新增的限时购活动商品"+seckillGoodsList.stream().collect(Collectors.joining(","))+"已存在!", new HashSet<>());
+
 
         saveAndValidateGoodsInfo(marketingCampaignVo);
 
@@ -74,8 +79,12 @@ public class TimeLimitBuyService {
         log.info("新增限时购活动营销活动返回id : " + campaignsId);
 
         LocalDate localDate = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
-        if(LocalDate.now().compareTo(localDate) == 0)//如果新增的活动商品是今天，那么直接修改商品的秒杀标识
+        if(LocalDate.now().compareTo(localDate) == 0) {
+            //如果新增的活动商品是今天，那么直接修改商品的秒杀标识
             saleProducer.produceSend(marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> new GoodsMessage(seckillGoodsVo.getGoodsId(), true)).collect(Collectors.toList()), "goods.update");
+            //活动结束时，将商品的限时购标识清空
+            startSaleEndJob(startSeckillTime, endSeckillTime);
+        }
 
 
     }
