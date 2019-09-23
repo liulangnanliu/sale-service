@@ -24,7 +24,7 @@ public class TimeLimitRemind implements Identifiable<Long> {
     @ApiModelProperty(value = "主键", name = "id")
     private Long id;
 
-    @ApiModelProperty(value = "提醒状态0 取消 1 正常", name = "status")
+    @ApiModelProperty(value = "提醒状态-1 取消 0 正常", name = "status")
     private Integer status;
 
     @Version

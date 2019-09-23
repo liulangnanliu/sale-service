@@ -58,9 +58,6 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
         this.timeLimitRemindRepository = timeLimitRemindRepository;
     }
 
-    @Value("${sale.notify.url}")
-    private String notifyUrl;
-
     @Override
     public MarketingCampaignVo getForTop(String cityCode) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

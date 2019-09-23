@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.Optional;
 
 @Api(tags = "限时购商品活动下单")
 @Slf4j
 @RestController
-@RequestMapping("/time-limit/order")
 public class TimeLimitBuyOrderController {
     private final TimeLimitBuyOrderService timeLimitBuyOrderService;
 
@@ -31,11 +31,22 @@ public class TimeLimitBuyOrderController {
         this.timeLimitBuyOrderService = timeLimitBuyOrderService;
     }
 
+    @PostMapping(value = "/time-limit/order", produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("hasAuthority('SQR_USER')")
     @ApiOperation(value = "限时购商品下单", notes = "限时购商品下单")
-    @PostMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<OrderUnifiedVo> addOrder(@Valid @RequestBody OrderSubmitVo orderSubmitVo){
         log.info("限时购商品活动下单orderSubmitVo:{}", orderSubmitVo);
         return Optional.of(timeLimitBuyOrderService.add(orderSubmitVo)).map(ResponseEntity :: ok).orElse(ResponseEntity.notFound().build());
     }
+
+
+    @PostMapping(value = "/time-limit/shoppingFee", produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PreAuthorize("hasAuthority('SQR_USER')")
+    @ApiOperation(value = "邮费查询", notes = "邮费查询")
+    public ResponseEntity<Map<String, Object>> getShoppingFee(@Valid @RequestBody OrderSubmitVo orderSubmitVo){
+        log.info("邮费查询orderSubmitVo:{}", orderSubmitVo);
+        return Optional.of(timeLimitBuyOrderService.getShoppingFee(orderSubmitVo)).map(ResponseEntity :: ok).orElse(ResponseEntity.notFound().build());
+    }
+
+
 }

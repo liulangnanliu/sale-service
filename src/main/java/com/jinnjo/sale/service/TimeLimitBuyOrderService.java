@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -65,11 +66,8 @@ public class TimeLimitBuyOrderService {
             return orderClient.orders(orderSubmitVo);
 
         //校验当前的时间是否是限时购活动时间
-        if(new Date().getTime() < campaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime())
-            throw new ConstraintViolationException("限时购活动时间未开始，不能购买活动商品!", new HashSet<>());
-
-        if(new Date().getTime() > campaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
-            throw new ConstraintViolationException("限时购活动已结束，价格发生变动，请重新下单!", new HashSet<>());
+        if(new Date().getTime() < campaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime() || new Date().getTime() > campaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
+            return orderClient.orders(orderSubmitVo);
 
         //校验用户的限购数量
         String buyCount = null;
@@ -79,7 +77,47 @@ public class TimeLimitBuyOrderService {
                 throw new ConstraintViolationException("用户今天累计购买数量已经超过限时购商品限购数量!", new HashSet<>());
         }
 
+        fillOrderItemVo(orderItemVo, seckillGoods);
+        //orderItemVo.setStock(goodsSkuSqr.getStock());
+
+        OrderUnifiedVo orderUnifiedVo = orderClient.limitTimeOrder(orderSubmitVo);
+
+        if(null != seckillGoods.getLimitCount()) {
+            buyCount = (orderItemVo.getGoodsCount() + (StringUtil.isEmpty(buyCount) ? 0 : Integer.parseInt(buyCount))) + "";
+            stringRedisTemplate17.opsForValue().set("timeLimitUser" + UserUtil.getCurrentUserId() + "_" + orderItemVo.getGoodsId(), buyCount, ChronoUnit.SECONDS.between(LocalDateTime.now(), LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)), TimeUnit.SECONDS);
+        }
+        return orderUnifiedVo;
+    }
+
+    public Map<String, Object> getShoppingFee(OrderSubmitVo orderSubmitVo){
+        //只考虑单商品购买
+        OrderItemVo orderItemVo = orderSubmitVo.getVoList().get(0).getOrderItemVOList().get(0);
+
+
+        MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId());
+
+        if(null == campaignVo)
+            return orderClient.getShoppingFee(orderSubmitVo, 0);
+
+        //校验当前的商品规格是否是限时购商品规格
+        SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> orderItemVo.getGoodsId().equals(seckillGoodsVo.getGoodsId()) && orderItemVo.getSkuId().equals(seckillGoodsVo.getGoodsSpecId()))
+                .findFirst()
+                .orElse(null);
+
+        if(null == seckillGoods)
+            return orderClient.getShoppingFee(orderSubmitVo, 0);
+
+        //校验当前的时间是否是限时购活动时间
+        if(new Date().getTime() < campaignVo.getDiscountSeckillInfo().getStartSeckillTime().getTime() || new Date().getTime() > campaignVo.getDiscountSeckillInfo().getEndSeckillTime().getTime())
+            return orderClient.getShoppingFee(orderSubmitVo, 0);
+
+        fillOrderItemVo(orderItemVo, seckillGoods);
+        return orderClient.getShoppingFee(orderSubmitVo, 1);
+    }
+
+    private void fillOrderItemVo(OrderItemVo orderItemVo, SeckillGoodsVo seckillGoods){
         orderItemVo.setDiscountPrice(seckillGoods.getSeckillPrice()); //商品折扣价设置为秒杀价格
+
         GoodsSqr goodsSqr = goodsSqrRepository.findByIdAndStatus(orderItemVo.getGoodsId(), 3);
         if(null == goodsSqr)
             throw new ConstraintViolationException("商品被删除或下架!", new HashSet<>());
@@ -106,15 +144,6 @@ public class TimeLimitBuyOrderService {
 
         orderItemVo.setPrice(goodsSkuSqr.getPrice());
         orderItemVo.setSpStrVal(goodsSkuSqr.getSpStrVal());
-        //orderItemVo.setStock(goodsSkuSqr.getStock());
-
-        OrderUnifiedVo orderUnifiedVo = orderClient.limitTimeOrder(orderSubmitVo);
-
-        if(null != seckillGoods.getLimitCount()) {
-            buyCount = (orderItemVo.getGoodsCount() + (StringUtil.isEmpty(buyCount) ? 0 : Integer.parseInt(buyCount))) + "";
-            stringRedisTemplate17.opsForValue().set("timeLimitUser" + UserUtil.getCurrentUserId() + "_" + orderItemVo.getGoodsId(), buyCount, ChronoUnit.SECONDS.between(LocalDateTime.now(), LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)), TimeUnit.SECONDS);
-        }
-        return orderUnifiedVo;
     }
 
 }
