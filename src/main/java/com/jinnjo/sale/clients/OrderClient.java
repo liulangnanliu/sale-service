@@ -12,10 +12,10 @@ import java.util.Map;
 @FeignClient(name = "orderClient",url = "${sale.ods.service.url}")
 public interface OrderClient {
     @PostMapping(value = "/orders")
-    OrderUnifiedVo orders(@RequestBody OrderSubmitVo orderSubmitVo);
+    Map<String, Object> orders(@RequestBody OrderSubmitVo orderSubmitVo);
 
     @PostMapping(value = "/orders-limited-time-purchase")
-    OrderUnifiedVo limitTimeOrder(@RequestBody OrderSubmitVo orderSubmitVo);
+    Map<String, Object> limitTimeOrder(@RequestBody OrderSubmitVo orderSubmitVo);
 
     @PostMapping(value = "/orders/shippingFee")
     Map<String, Object> getShoppingFee(@RequestBody OrderSubmitVo orderSubmitVo, @RequestParam("goodsType") Integer goodsType);

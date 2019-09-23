@@ -37,7 +37,6 @@ public class OrderUnifiedVo {
     private String OrderNo;
 
     @ApiModelProperty(value = "订单集合")
-    @RestResource(rel = "orders")
     public List<OrderInfo> orderInfoList;
 
     @ApiModelProperty(value = "创建时间")
@@ -66,7 +65,7 @@ public class OrderUnifiedVo {
 
 
     @Data
-    public class OrderInfo {
+    public static class OrderInfo {
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         @ApiModelProperty(value = "主键", name = "id")
         private Long id;
@@ -272,7 +271,6 @@ public class OrderUnifiedVo {
         @ApiModelProperty(value = "商家拒绝用户取消申请原因")
         private String mchReasons;
 
-
         @ApiModelProperty(value = "商铺来源(0:自主注册 1:苏宁易购,网易严选 2:京东商城 3:龙马助农特色馆 4:社区人卡商城 5:积分商城 6:龙马海淘) ")
         private Integer sourceType;
 
@@ -375,7 +373,7 @@ public class OrderUnifiedVo {
     }
 
     @Data
-    public class OrderItem {
+    public static class OrderItem {
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         @ApiModelProperty(value = "主键", name = "id")
         private Long id;
@@ -567,7 +565,6 @@ public class OrderUnifiedVo {
         private BigDecimal partnerDeliveryFee = BigDecimal.ZERO;
 
     }
-
 
 }
 
