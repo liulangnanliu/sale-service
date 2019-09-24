@@ -140,21 +140,26 @@ public class TimeLimitBuyService {
 
 
         Date startSeckillTime = marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime();
-        if(null == startSeckillTime)
-            throw new ConstraintViolationException("限时购活动时间不能为空!", new HashSet<>());
+        Date endSeckillTime = marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime();
+        if(null == startSeckillTime || null == endSeckillTime)
+            throw new ConstraintViolationException("修改的限时购活动时间不能为空!", new HashSet<>());
+
+        if(startSeckillTime.compareTo(endSeckillTime) >= 0)
+            throw new ConstraintViolationException("修改的限时购活动开始时间不能大于结束时间!", new HashSet<>());
+
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         LocalDate localDate = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
         MarketingCampaignVo target = campaignCilent.getCampaignById(Long.parseLong(marketingCampaignVo.getId()));
         if(LocalDate.now().compareTo(localDate) == 0){//如果新增的活动商品是今天，那么直接修改商品的秒杀标识
-            if(!target.getDiscountSeckillInfo().getStartSeckillTime().equals(marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime())
-                    || !target.getDiscountSeckillInfo().getEndSeckillTime().equals(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime()))
+            if(!target.getDiscountSeckillInfo().getStartSeckillTime().equals(startSeckillTime)
+                    || !target.getDiscountSeckillInfo().getEndSeckillTime().equals(endSeckillTime))
                 throw new ConstraintViolationException("当天限时购活动时间不能修改!", new HashSet<>());
         }else{
             //校验活动时间
-            if(!target.getDiscountSeckillInfo().getStartSeckillTime().equals(marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime())
-                    || !target.getDiscountSeckillInfo().getEndSeckillTime().equals(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime())){
-                Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime()), marketingCampaignVo.getId());
+            if(!target.getDiscountSeckillInfo().getStartSeckillTime().equals(startSeckillTime)
+                    || !target.getDiscountSeckillInfo().getEndSeckillTime().equals(endSeckillTime)){
+                Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(endSeckillTime), marketingCampaignVo.getId());
                 if(timeFlag == 1)
                     throw new ConstraintViolationException("修改的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
             }
@@ -166,7 +171,7 @@ public class TimeLimitBuyService {
         List<Long> targetGoodsIds = target.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList());
         String newGoodsIds = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(t -> !targetGoodsIds.contains(t.getGoodsId())).map(seckillGoodsVo -> String.valueOf(seckillGoodsVo.getGoodsId())).collect(Collectors.joining(","));
         if(StringUtil.isNotEmpty(newGoodsIds)){
-            LocalDate seckillTime = LocalDateTime.ofInstant(marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime().toInstant(), ZoneId.systemDefault()).toLocalDate();
+            LocalDate seckillTime = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
             List<String> seckillGoodsList = campaignCilent.checkSeckillGoodsList(seckillTime.toString(), newGoodsIds);
             if(seckillGoodsList.size() > 0)
                 throw new ConstraintViolationException("修改的限时购活动商品"+seckillGoodsList.stream().collect(Collectors.joining(","))+"已存在!", new HashSet<>());
@@ -174,6 +179,14 @@ public class TimeLimitBuyService {
 
 
         campaignCilent.updateCampaign(marketingCampaignVo.getId(), marketingCampaignVo);
+
+        if(LocalDate.now().compareTo(localDate) == 0 && StringUtil.isNotEmpty(newGoodsIds)) {
+            //如果新增的活动商品是今天，那么直接修改商品的秒杀标识
+            saleProducer.produceSend(marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(t -> !targetGoodsIds.contains(t.getGoodsId()))
+                                                                                                                .map(seckillGoodsVo -> new GoodsMessage(seckillGoodsVo.getGoodsId(), true))
+                                                                                                                .collect(Collectors.toList())
+                                    , "goods.update");
+        }
     }
 
     public void delete(Long id){
