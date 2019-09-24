@@ -36,7 +36,7 @@ public interface CampaignCilent {
     @PutMapping(value = "/campaigns/change-status/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     void changeStatus(@PathVariable("id") Long id, @RequestParam("status") Integer status);
 
-    @GetMapping(value = "/campaigns/testgoods", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
+    @GetMapping(value = "/campaigns/seckillgoodsbytime", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     List<SeckillGoodsVo> getGoodsListBySeckTime(@RequestParam("startSeckillTime")String startSeckillTime,@RequestParam("endSeckillTime")String endSeckillTime);
 
     @GetMapping(value = "/campaigns/seckill/page", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
