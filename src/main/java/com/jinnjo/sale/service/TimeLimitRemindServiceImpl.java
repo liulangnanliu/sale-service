@@ -1,8 +1,10 @@
 package com.jinnjo.sale.service;
 
+import com.alibaba.fastjson.JSON;
 import com.jinnjo.sale.domain.TimeLimitRemind;
 import com.jinnjo.sale.enums.StatusEnum;
 import com.jinnjo.sale.repo.TimeLimitRemindRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.util.List;
  * description:
  */
 @Service
+@Slf4j
 public class TimeLimitRemindServiceImpl implements TimeLimitRemindService{
     private final TimeLimitRemindRepository timeLimitRemindRepository;
     private final TimeLimitBuyAppService timeLimitBuyAppService;
@@ -28,7 +31,11 @@ public class TimeLimitRemindServiceImpl implements TimeLimitRemindService{
         Date date = new Date(new Date().getTime()+300000L);
         List<TimeLimitRemind> timeLimitRemindList = timeLimitRemindRepository.findByStatusAndActivityTimeLessThanEqual(StatusEnum.NORMAL.getCode(),date);
         timeLimitRemindList.forEach(timeLimitRemind ->{
-            timeLimitBuyAppService.remindNotify(timeLimitRemind.getUserId(),timeLimitRemind.getGoodsId());
+            try {
+                timeLimitBuyAppService.remindNotify(timeLimitRemind.getUserId(),timeLimitRemind.getGoodsId());
+            } catch (Exception e) {
+                log.error("发送推送异常{}",JSON.toJSONString(timeLimitRemind));
+            }
             timeLimitRemind.setStatus(StatusEnum.DELETE.getCode());
         });
         timeLimitRemindRepository.saveAll(timeLimitRemindList);
