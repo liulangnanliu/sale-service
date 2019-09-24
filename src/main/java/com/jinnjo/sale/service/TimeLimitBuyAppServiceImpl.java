@@ -60,73 +60,83 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     @Override
     @SuppressWarnings("all")
     public MarketingCampaignVo getForTop(String cityCode) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = simpleDateFormat.format(new Date());
-        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date);
-        if (marketingCampaignVoList.size()<=0){
-            return null;
-        }
-        List<MarketingCampaignVo> marketingCampaignVoArrayList = new ArrayList<>();
-        List<MarketingCampaignVo> finallyList = new ArrayList<>();
-        for (MarketingCampaignVo marketingCampaignVo:marketingCampaignVoList){
-            DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfo();
-            if (null!=discountSeckillInfoVo){
-                Date startTime = discountSeckillInfoVo.getStartSeckillTime();
-                Date endTime = discountSeckillInfoVo.getEndSeckillTime();
-                Date nowTime = new Date();
-                if (startTime.before(nowTime)&&endTime.after(nowTime)){
-                    //当前时间在活动时间段内
-                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
-                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
-                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
-                    if (seckillGoodsVoList.size()>2){
-                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
-                    }
-                    marketingCampaignVo.setTimeLimitStatus(1);
-                    return marketingCampaignVo;
-                }
-                if (endTime.after(nowTime)&&startTime.after(nowTime)){
-                    //当前时间在活动时间段之前
-                    Long start = startTime.getTime();
-                    Long now = nowTime.getTime();
-                    Long interval = start - now;
-                    marketingCampaignVo.setInterval(interval);
-                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
-                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
-                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
-                    if (UserUtil.isLogin()){
-                        List<TimeLimitRemind> timeLimitReminds = timeLimitRemindRepository.findByUserIdAndStatus(UserUtil.getCurrentUserId(),StatusEnum.NORMAL.getCode());
-                        seckillGoodsVoList.forEach(seckillGoodsVo -> {
-                            timeLimitReminds.forEach(timeLimitRemind -> {
-                                if (seckillGoodsVo.getGoodsId().equals(timeLimitRemind.getGoodsId())){
-                                    seckillGoodsVo.setRemind(1);
-                                }
-                            });
-                        });
-                    }
-                    if (seckillGoodsVoList.size()>2){
-                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
-                    }
-                    marketingCampaignVo.setTimeLimitStatus(0);
-                    marketingCampaignVoArrayList.add(marketingCampaignVo);
-                }
-                if (endTime.before(nowTime)){
-                    //当前时间在活动时间段之后
-                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
-                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
-                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
-                    if (seckillGoodsVoList.size()>2){
-                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
-                    }
-                    marketingCampaignVo.setTimeLimitStatus(3);
-                    finallyList.add(marketingCampaignVo);
-                }
-            }
-        }
-        if (marketingCampaignVoArrayList.size()>0){
-            return marketingCampaignVoArrayList.stream().min(Comparator.comparing(MarketingCampaignVo::getInterval)).orElse(null);
-        }
-        return finallyList.stream().max(Comparator.comparing(MarketingCampaignVo::getEndTime)).orElse(null);
+        Date date = new Date(new Date().getTime()+300000L);
+        List<TimeLimitRemind> timeLimitRemindList = timeLimitRemindRepository.findByStatusAndActivityTimeLessThanEqual(StatusEnum.NORMAL.getCode(),date);
+        timeLimitRemindList.forEach(timeLimitRemind ->{
+            this.remindNotify(timeLimitRemind.getUserId(),timeLimitRemind.getGoodsId());
+            timeLimitRemind.setStatus(StatusEnum.DELETE.getCode());
+        });
+        timeLimitRemindRepository.saveAll(timeLimitRemindList);
+
+        return null;
+
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        String date = simpleDateFormat.format(new Date());
+//        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date);
+//        if (marketingCampaignVoList.size()<=0){
+//            return null;
+//        }
+//        List<MarketingCampaignVo> marketingCampaignVoArrayList = new ArrayList<>();
+//        List<MarketingCampaignVo> finallyList = new ArrayList<>();
+//        for (MarketingCampaignVo marketingCampaignVo:marketingCampaignVoList){
+//            DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfo();
+//            if (null!=discountSeckillInfoVo){
+//                Date startTime = discountSeckillInfoVo.getStartSeckillTime();
+//                Date endTime = discountSeckillInfoVo.getEndSeckillTime();
+//                Date nowTime = new Date();
+//                if (startTime.before(nowTime)&&endTime.after(nowTime)){
+//                    //当前时间在活动时间段内
+//                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
+//                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+//                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
+//                    if (seckillGoodsVoList.size()>2){
+//                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
+//                    }
+//                    marketingCampaignVo.setTimeLimitStatus(1);
+//                    return marketingCampaignVo;
+//                }
+//                if (endTime.after(nowTime)&&startTime.after(nowTime)){
+//                    //当前时间在活动时间段之前
+//                    Long start = startTime.getTime();
+//                    Long now = nowTime.getTime();
+//                    Long interval = start - now;
+//                    marketingCampaignVo.setInterval(interval);
+//                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
+//                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+//                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
+//                    if (UserUtil.isLogin()){
+//                        List<TimeLimitRemind> timeLimitReminds = timeLimitRemindRepository.findByUserIdAndStatus(UserUtil.getCurrentUserId(),StatusEnum.NORMAL.getCode());
+//                        seckillGoodsVoList.forEach(seckillGoodsVo -> {
+//                            timeLimitReminds.forEach(timeLimitRemind -> {
+//                                if (seckillGoodsVo.getGoodsId().equals(timeLimitRemind.getGoodsId())){
+//                                    seckillGoodsVo.setRemind(1);
+//                                }
+//                            });
+//                        });
+//                    }
+//                    if (seckillGoodsVoList.size()>2){
+//                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
+//                    }
+//                    marketingCampaignVo.setTimeLimitStatus(0);
+//                    marketingCampaignVoArrayList.add(marketingCampaignVo);
+//                }
+//                if (endTime.before(nowTime)){
+//                    //当前时间在活动时间段之后
+//                    List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
+//                    seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
+//                    seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
+//                    if (seckillGoodsVoList.size()>2){
+//                        discountSeckillInfoVo.setSeckillGoodsList(seckillGoodsVoList.subList(0,3));
+//                    }
+//                    marketingCampaignVo.setTimeLimitStatus(3);
+//                    finallyList.add(marketingCampaignVo);
+//                }
+//            }
+//        }
+//        if (marketingCampaignVoArrayList.size()>0){
+//            return marketingCampaignVoArrayList.stream().min(Comparator.comparing(MarketingCampaignVo::getInterval)).orElse(null);
+//        }
+//        return finallyList.stream().max(Comparator.comparing(MarketingCampaignVo::getEndTime)).orElse(null);
     }
 
     @Override
@@ -273,15 +283,12 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
 
         MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
         if(null == campaignVo)
-            throw new ConstraintViolationException("当前商品没有设置限时购活动!", new HashSet<>());
+            return;
 
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
 
         Date endSeckillTime = campaignVo.getDiscountSeckillInfo().getEndSeckillTime();
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(endSeckillTime.toInstant(), ZoneId.systemDefault());
-
-        if(localDateTime.compareTo(LocalDateTime.now().plusMinutes(5)) < 0)
-            throw new ConstraintViolationException("准备好，抢购马上开始咯！", new HashSet<>());
+        //LocalDateTime localDateTime = LocalDateTime.ofInstant(endSeckillTime.toInstant(), ZoneId.systemDefault());
 
         GoodsTimelimitedVo goodsTimelimitedVo = new GoodsTimelimitedVo();
         goodsTimelimitedVo.setContent("你关注的商品『" + seckillGoods.getGoodsName() + "』马上要开抢啦！");
@@ -289,8 +296,8 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
         map.put("act", "miaosha");
         map.put("id", id);
         goodsTimelimitedVo.setExtras(map);
-        goodsTimelimitedVo.setPushtype(1);
-        goodsTimelimitedVo.setStartdate(localDateTime.minusMinutes(5).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        goodsTimelimitedVo.setPushtype(0);
+        //goodsTimelimitedVo.setStartdate(localDateTime.minusMinutes(5).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         goodsTimelimitedVo.setType("member");
         goodsTimelimitedVo.setUserid(userId);
         goodsTimelimitedVo.setSign(SignatureUtil.signParams(goodsTimelimitedVo));

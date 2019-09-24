@@ -31,11 +31,7 @@ public class TimeLimitRemindServiceImpl implements TimeLimitRemindService{
         Date date = new Date(new Date().getTime()+300000L);
         List<TimeLimitRemind> timeLimitRemindList = timeLimitRemindRepository.findByStatusAndActivityTimeLessThanEqual(StatusEnum.NORMAL.getCode(),date);
         timeLimitRemindList.forEach(timeLimitRemind ->{
-            try {
-                timeLimitBuyAppService.remindNotify(timeLimitRemind.getUserId(),timeLimitRemind.getGoodsId());
-            } catch (Exception e) {
-                log.error("发送推送异常{}",JSON.toJSONString(timeLimitRemind));
-            }
+            timeLimitBuyAppService.remindNotify(timeLimitRemind.getUserId(),timeLimitRemind.getGoodsId());
             timeLimitRemind.setStatus(StatusEnum.DELETE.getCode());
         });
         timeLimitRemindRepository.saveAll(timeLimitRemindList);

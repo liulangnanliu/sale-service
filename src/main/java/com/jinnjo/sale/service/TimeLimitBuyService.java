@@ -85,8 +85,6 @@ public class TimeLimitBuyService {
             //活动结束时，将商品的限时购标识清空
             startSaleEndJob(startSeckillTime, endSeckillTime);
         }
-
-
     }
 
     private List<GoodsSqr> saveAndValidateGoodsInfo(MarketingCampaignVo marketingCampaignVo){
@@ -195,10 +193,27 @@ public class TimeLimitBuyService {
 
     public void deleteGoods(Long id, Long goodsId){
         campaignCilent.deleteGoods(id, goodsId);
+
+        MarketingCampaignVo marketingCampaignVo = getTimeLimitBuyById(id);
+        if(null != marketingCampaignVo){
+            LocalDate localDate = LocalDateTime.ofInstant(marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime().toInstant(), ZoneId.systemDefault()).toLocalDate();
+            if(LocalDate.now().compareTo(localDate) == 0 )
+                saleProducer.produceSend(Arrays.asList(new GoodsMessage(goodsId, false)), "goods.update");
+        }
     }
 
     public void changeStatus(Long id, Integer status){
         campaignCilent.changeStatus(id, status);
+
+        if(2 == status){
+            MarketingCampaignVo marketingCampaignVo = getTimeLimitBuyById(id);
+            if(null != marketingCampaignVo){
+                //将所有商品的限时购标识取消
+                if(marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().size() > 0)
+                    saleProducer.produceSend(marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> new GoodsMessage(seckillGoodsVo.getGoodsId(), false)).collect(Collectors.toList()), "goods.update");
+            }
+        }
+
     }
 
     public MarketingCampaignVo getTimeLimitBuyById(Long id){
@@ -233,7 +248,8 @@ public class TimeLimitBuyService {
         List<Long> goodIds = campaignsByPages.stream().map(marketingCampaignVo -> marketingCampaignVo.getDiscountSeckillInfo()).flatMap(discountSeckillInfoVo -> discountSeckillInfoVo.getSeckillGoodsList().stream()).map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList());
 
         //今天所有的商品标识为限时购商品
-        saleProducer.produceSend(goodIds.stream().map(goodId -> new GoodsMessage(goodId, true)).collect(Collectors.toList()), "goods.update");
+        if(null != goodIds && goodIds.size() > 0)
+            saleProducer.produceSend(goodIds.stream().map(goodId -> new GoodsMessage(goodId, true)).collect(Collectors.toList()), "goods.update");
 
         campaignsByPages.forEach(marketingCampaignVo -> {
             DiscountSeckillInfoVo discountSeckillInfoVo = marketingCampaignVo.getDiscountSeckillInfo();
@@ -260,9 +276,9 @@ public class TimeLimitBuyService {
 
     public void executeSaleEndJob(String startSeckillTime, String endSeckillTime){
         List<SeckillGoodsVo> seckillGoods = campaignCilent.getGoodsListBySeckTime(startSeckillTime, endSeckillTime);
-        List<Long> goodIds = seckillGoods.stream().map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList());
         //将所有商品的限时购标识取消
-        saleProducer.produceSend(goodIds.stream().map(goodId -> new GoodsMessage(goodId, false)).collect(Collectors.toList()), "goods.update");
+        if(null != seckillGoods && seckillGoods.size() > 0)
+            saleProducer.produceSend(seckillGoods.stream().map(seckillGoodsVo -> new GoodsMessage(seckillGoodsVo.getGoodsId(), false)).collect(Collectors.toList()), "goods.update");
 
     }
 }

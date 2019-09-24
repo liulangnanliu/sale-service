@@ -22,4 +22,7 @@ public interface GoodsClient {
 
     @GetMapping(value = "/skus-goods-sku")
     List<GoodsSkuSqr> findGoodsSku(@RequestParam("skuId")String skuId);
+
+    @GetMapping(value = "/skus/{sku-id}")
+    GoodsSkuSqr findGoodsSkuById(@PathVariable("sku-id")Long skuId);
 }

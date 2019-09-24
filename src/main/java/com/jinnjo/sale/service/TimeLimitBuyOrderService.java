@@ -2,6 +2,7 @@ package com.jinnjo.sale.service;
 
 import com.jinnjo.base.util.StringUtil;
 import com.jinnjo.sale.clients.CampaignCilent;
+import com.jinnjo.sale.clients.GoodsClient;
 import com.jinnjo.sale.clients.OrderClient;
 import com.jinnjo.sale.domain.GoodsSkuSqr;
 import com.jinnjo.sale.domain.GoodsSqr;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +35,8 @@ public class TimeLimitBuyOrderService {
 
     private final OrderClient orderClient;
 
+    private final GoodsClient goodsClient;
+
     private final GoodsSqrRepository goodsSqrRepository;
 
     private final StringRedisTemplate stringRedisTemplate17;
@@ -40,10 +44,12 @@ public class TimeLimitBuyOrderService {
     @Autowired
     public TimeLimitBuyOrderService(CampaignCilent campaignCilent,
                                     OrderClient orderClient,
+                                    GoodsClient goodsClient,
                                     GoodsSqrRepository goodsSqrRepository,
                                     @Qualifier("redis17") StringRedisTemplate stringRedisTemplate17){
         this.campaignCilent = campaignCilent;
         this.orderClient = orderClient;
+        this.goodsClient = goodsClient;
         this.goodsSqrRepository = goodsSqrRepository;
         this.stringRedisTemplate17 = stringRedisTemplate17;
     }
@@ -116,6 +122,12 @@ public class TimeLimitBuyOrderService {
     }
 
     public void goodsLimit(Long goodsId, Long skuId, Integer count){
+
+        GoodsSkuSqr goodsSkuSqr = goodsClient.findGoodsSkuById(skuId);
+
+        if(count > goodsSkuSqr.getStock())
+            throw new ConstraintViolationException("库存不足", new HashSet<>());
+
         MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), goodsId);
 
         if(null == campaignVo)
