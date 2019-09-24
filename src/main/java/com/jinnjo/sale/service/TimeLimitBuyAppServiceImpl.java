@@ -16,7 +16,6 @@ import com.jinnjo.sale.domain.vo.MarketingCampaignVo;
 import com.jinnjo.sale.domain.vo.SeckillGoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -59,6 +58,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     }
 
     @Override
+    @SuppressWarnings("all")
     public MarketingCampaignVo getForTop(String cityCode) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
@@ -94,7 +94,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                     List<SeckillGoodsVo> seckillGoodsVoList = discountSeckillInfoVo.getSeckillGoodsList();
                     seckillGoodsVoList.removeIf(seckillGoodsVo -> seckillGoodsVo.getStatus().equals(4));
                     seckillGoodsVoList.removeIf(seckillGoodsVo -> null!=seckillGoodsVo.getCitycode()&&!seckillGoodsVo.getCitycode().equals(cityCode)&&!seckillGoodsVo.getCitycode().equals("999999"));
-                    if (null!=UserUtil.getCurrentUserId()){
+                    if (UserUtil.isLogin()){
                         List<TimeLimitRemind> timeLimitReminds = timeLimitRemindRepository.findByUserIdAndStatus(UserUtil.getCurrentUserId(),StatusEnum.NORMAL.getCode());
                         seckillGoodsVoList.forEach(seckillGoodsVo -> {
                             timeLimitReminds.forEach(timeLimitRemind -> {
@@ -149,7 +149,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
                 }
             });
         });
-        if (null!=UserUtil.getCurrentUserId()){
+        if (UserUtil.isLogin()){
             List<TimeLimitRemind> timeLimitRemindList = timeLimitRemindRepository.findByUserIdAndStatus(UserUtil.getCurrentUserId(),StatusEnum.NORMAL.getCode());
             pageList.forEach(seckillGoodsVo -> {
                 timeLimitRemindList.forEach(timeLimitRemind -> {
@@ -211,7 +211,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             throw new ConstraintViolationException("当前商品不存在!", new HashSet<>());
         }
         Integer remind = 0;
-        if (null!=UserUtil.getCurrentUserId()){
+        if (UserUtil.isLogin()){
             TimeLimitRemind timeLimitRemind = timeLimitRemindRepository.findByUserIdAndGoodsIdAndStatus(UserUtil.getCurrentUserId(),id,StatusEnum.NORMAL.getCode());
             if (null!=timeLimitRemind){
                 remind = 1;

@@ -2,6 +2,7 @@ package com.jinnjo.sale.utils;
 
 import com.jinnjo.sale.domain.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,6 +48,11 @@ public class UserUtil {
 
     public static Long getCurrentUserId(){
         return getUser().getUserId();
+    }
+
+    public static Boolean isLogin() {
+        Authentication authentication = getCurrentUserAuthentication();
+        return !(authentication instanceof AnonymousAuthenticationToken) && !getAuthorities().contains("ROLE_ANONYMOUS");
     }
 
 
