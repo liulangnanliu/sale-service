@@ -286,8 +286,9 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
             return;
 
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
-
-        Date endSeckillTime = campaignVo.getDiscountSeckillInfo().getEndSeckillTime();
+        if(null == seckillGoods)
+            return;
+        //Date endSeckillTime = campaignVo.getDiscountSeckillInfo().getEndSeckillTime();
         //LocalDateTime localDateTime = LocalDateTime.ofInstant(endSeckillTime.toInstant(), ZoneId.systemDefault());
 
         GoodsTimelimitedVo goodsTimelimitedVo = new GoodsTimelimitedVo();
