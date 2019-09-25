@@ -105,7 +105,7 @@ public class TimeLimitBuyService {
             });
         }).map(seckillGoodsVo -> seckillGoodsVo.getGoodsName()).collect(Collectors.joining(","));
         if(StringUtil.isNotEmpty(goodsName))
-            throw new ConstraintViolationException("新增的限时购活动商品"+goodsName+"价格不能大于原先价格!", new HashSet<>());
+            throw new ConstraintViolationException("新增的限时购活动商品【"+goodsName+"】价格需小于原先价格!", new HashSet<>());
 
         return goodsSqrs;
     }
