@@ -61,7 +61,7 @@ public class TimeLimitBuyService {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(endSeckillTime), null);
-        if(timeFlag == 1)
+        if(timeFlag > 0)
             throw new ConstraintViolationException("新增的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
 
         LocalDate seckillTime = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
@@ -158,7 +158,7 @@ public class TimeLimitBuyService {
             if(!target.getDiscountSeckillInfo().getStartSeckillTime().equals(startSeckillTime)
                     || !target.getDiscountSeckillInfo().getEndSeckillTime().equals(endSeckillTime)){
                 Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(endSeckillTime), marketingCampaignVo.getId());
-                if(timeFlag == 1)
+                if(timeFlag > 0)
                     throw new ConstraintViolationException("修改的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
             }
         }
