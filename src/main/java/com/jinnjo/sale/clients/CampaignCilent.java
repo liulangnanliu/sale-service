@@ -27,7 +27,7 @@ public interface CampaignCilent {
     @PutMapping(value = "/campaigns/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     MarketingCampaignVo updateCampaign(@PathVariable("id") String id, @RequestBody MarketingCampaignVo marketingCampaignVo);
 
-    @DeleteMapping(value = "/campaigns/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
+    @DeleteMapping(value = "/campaignsbyid/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})
     void deleteCampaign(@PathVariable("id") Long id);
 
     @DeleteMapping(value = "/campaigns/deletegoods", headers = {FeignSecurityBean.SECURITY_AUTH_SERVICE})

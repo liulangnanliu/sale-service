@@ -71,12 +71,12 @@ public class TimeLimitBuyController {
                        .orElse(ResponseEntity.notFound().build());
     }
 
-//    @ApiOperation(value = "删除限时购活动", notes = "删除限时购活动")
-//    @DeleteMapping
-//    public void deleteTimeLimitBuy(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id){
-//        log.info("删除限时购活动id:{}", id);
-//        timeLimitBuyService.delete(id);
-//    }
+    @ApiOperation(value = "删除限时购活动", notes = "删除限时购活动")
+    @DeleteMapping
+    public void deleteTimeLimitBuy(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id){
+        log.info("删除限时购活动id:{}", id);
+        timeLimitBuyService.delete(id);
+    }
 
     @ApiOperation(value = "删除限时购活动商品", notes = "删除限时购活动商品")
     @DeleteMapping(value = "/goods")
