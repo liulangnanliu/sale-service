@@ -287,7 +287,6 @@ public class TimeLimitBuyService {
             e.printStackTrace();
             log.error("TimeLimitBuyService.scheduler.checkExists执行异常");
         }
-        log.info("TimeLimitBuyService.scheduler.checkExists:{}", existFlag);
         if(existFlag)
             return;
         JobDetail jobDetail = JobBuilder.newJob(SaleEndJob.class).withIdentity("saleEndJob" + sdf.format(endSeckillTime), "saleGroup").usingJobData("startTime", sdf.format(startSeckillTime)).usingJobData("endTime", sdf.format(endSeckillTime)).build();
