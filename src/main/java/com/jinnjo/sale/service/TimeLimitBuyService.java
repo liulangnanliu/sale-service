@@ -192,7 +192,7 @@ public class TimeLimitBuyService {
         if(null != marketingCampaignVo){
             Date now = new Date();
             if(now.compareTo(marketingCampaignVo.getDiscountSeckillInfo().getStartSeckillTime()) >= 0
-                    && now.compareTo(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime()) <= 0)
+                    && now.compareTo(marketingCampaignVo.getDiscountSeckillInfo().getEndSeckillTime()) <= 0 && marketingCampaignVo.getStatus() != 2) //已关闭的活动可以删除
                 throw new ConstraintViolationException("正在开抢的活动不能删除", new HashSet<>());
 
             campaignCilent.deleteCampaign(id);
