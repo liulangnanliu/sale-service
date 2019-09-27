@@ -280,13 +280,23 @@ public class TimeLimitBuyService {
 
     private void startSaleEndJob(Date startSeckillTime, Date endSeckillTime){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        boolean existFlag = false;
+        try {
+            existFlag = scheduler.checkExists(JobKey.jobKey("saleEndJob" + sdf.format(endSeckillTime), "saleGroup"));
+        }catch (SchedulerException e){
+            e.printStackTrace();
+            log.error("TimeLimitBuyService.scheduler.checkExists执行异常");
+        }
+        log.info("TimeLimitBuyService.scheduler.checkExists:{}", existFlag);
+        if(existFlag)
+            return;
         JobDetail jobDetail = JobBuilder.newJob(SaleEndJob.class).withIdentity("saleEndJob" + sdf.format(endSeckillTime), "saleGroup").usingJobData("startTime", sdf.format(startSeckillTime)).usingJobData("endTime", sdf.format(endSeckillTime)).build();
         Trigger trigger = TriggerBuilder.newTrigger().forJob(jobDetail).startAt(endSeckillTime).build();
         try {
             scheduler.scheduleJob(jobDetail, trigger);
         }catch (SchedulerException e){
             e.printStackTrace();
-            log.error("saleEndJob执行异常");
+            log.error("TimeLimitBuyService.scheduler.scheduleJob执行异常");
         }
     }
 
