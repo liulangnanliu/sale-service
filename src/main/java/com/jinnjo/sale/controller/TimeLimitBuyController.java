@@ -13,12 +13,10 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
 @Api(tags = "限时购商品活动")
@@ -33,6 +31,7 @@ public class TimeLimitBuyController {
         this.timeLimitBuyService = timeLimitBuyService;
     }
 
+    @PreAuthorize("hasAuthority('SQR_ADMIN')")
     @ApiOperation(value = "添加限时购活动", notes = "添加限时购活动")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public void addTimeLimitBuy(@Valid @RequestBody @ApiParam(name = "marketingCampaignVo",value = "新增限时购对象")MarketingCampaignVo marketingCampaignVo){
@@ -40,7 +39,7 @@ public class TimeLimitBuyController {
         timeLimitBuyService.add(marketingCampaignVo);
     }
 
-
+    @PreAuthorize("hasAuthority('SQR_ADMIN')")
     @ApiOperation(value = "修改限时购活动", notes = "修改限时购活动")
     @PutMapping(produces = MediaTypes.HAL_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public void updateTimeLimitBuy(@Valid @RequestBody @ApiParam(name = "marketingCampaignVo",value = "修改限时购对象")MarketingCampaignVo marketingCampaignVo){
@@ -71,6 +70,7 @@ public class TimeLimitBuyController {
                        .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAuthority('SQR_ADMIN')")
     @ApiOperation(value = "删除限时购活动", notes = "删除限时购活动")
     @DeleteMapping
     public void deleteTimeLimitBuy(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id){
@@ -78,6 +78,7 @@ public class TimeLimitBuyController {
         timeLimitBuyService.delete(id);
     }
 
+    @PreAuthorize("hasAuthority('SQR_ADMIN')")
     @ApiOperation(value = "删除限时购活动商品", notes = "删除限时购活动商品")
     @DeleteMapping(value = "/goods")
     public void deleteTimeLimitBuyGoods(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id,
@@ -86,6 +87,7 @@ public class TimeLimitBuyController {
         timeLimitBuyService.deleteGoods(id, goodsId);
     }
 
+    @PreAuthorize("hasAuthority('SQR_ADMIN')")
     @ApiOperation(value = "变更限时购活动状态", notes = "变更限时购活动状态")
     @PutMapping(value = "/changeStatus", produces = MediaTypes.HAL_JSON_VALUE)
     public void shutTimeLimitBuy(@ApiParam(name = "id", value = "活动id", required = true) @RequestParam Long id,
