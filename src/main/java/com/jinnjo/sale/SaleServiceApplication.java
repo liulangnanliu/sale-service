@@ -4,7 +4,6 @@ import com.jinnjo.base.config.SpringContextUtil;
 import com.jinnjo.base.config.WebMvcConfig;
 import com.jinnjo.base.security.CustomUserInfoTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,7 +26,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.annotation.Resource;
 import java.nio.charset.Charset;
 
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
@@ -105,5 +103,17 @@ public class SaleServiceApplication implements WebMvcConfigurer {
 		registry.addResourceHandler("/webjars/**")
 				.addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
+
+//	@Bean
+//	public SchedulerFactoryBeanCustomizer schedulerFactoryBeanCustomizer(){
+//		return (schedulerFactoryBean) -> {
+//			JobDetail jobDetail = JobBuilder.newJob(RemindJob.class).withIdentity("remindJob1", "remindGroup1").storeDurably(true).build();
+//			schedulerFactoryBean.setJobDetails(jobDetail);
+//			CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/1 * * * ?");
+//			CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("remindJob1", "remindGroup1").forJob(jobDetail)
+//					.withSchedule(cronScheduleBuilder).build();
+//			schedulerFactoryBean.setTriggers(cronTrigger);
+//		};
+//	}
 
 }

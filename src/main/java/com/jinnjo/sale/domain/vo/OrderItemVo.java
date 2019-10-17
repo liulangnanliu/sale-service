@@ -98,4 +98,7 @@ public class OrderItemVo {
 
     @ApiModelProperty(value = "合伙人配送费")
     private BigDecimal partnerDeliveryFee = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "是否有关联赠品 1有")
+    private Integer isHavePremium;
 }

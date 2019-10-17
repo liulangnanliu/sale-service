@@ -91,4 +91,7 @@ public class ListenGoodsView {
     @ApiModelProperty(value = "限时购标识(否:0,是:1)", name = "timeBugFlag")
     private Boolean timeBugFlag;
 
+    @ApiModelProperty(value="是否赠品(1:赠品)" , name = "isPremium")
+    private String isPremium;
+
 }

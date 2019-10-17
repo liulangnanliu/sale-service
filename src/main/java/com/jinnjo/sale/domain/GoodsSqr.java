@@ -76,6 +76,9 @@ public class GoodsSqr  extends BaseEntity{
     @ApiModelProperty(value = "区域合伙人配送费", name = "partnerDeliveryFee")
     private BigDecimal partnerDeliveryFee = new BigDecimal(0.00);
 
+    @ApiModelProperty(value="是否赠品(1:赠品)" , name = "isPremium")
+    private String isPremium;
+
     @ApiModelProperty(value = "商品规格", name = "skuInfos")
     @NotNull(message = "商品规格信息不能为空！")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
