@@ -172,6 +172,7 @@ public class TimeLimitBuyOrderService {
         orderItemVo.setIcon(goodsSqr.getIcon());
         orderItemVo.setSource(goodsSqr.getSource());
         orderItemVo.setIsHavePremium(StringUtil.isEmpty(goodsSqr.getIsPremium()) ?  0 : Integer.parseInt(goodsSqr.getIsPremium()));
+        orderItemVo.setCardType(goodsSqr.getCardType());
 
         GoodsSkuSqr goodsSkuSqr = goodsSqr.getSkuInfos().stream().filter(skuInfo -> skuInfo.getId().equals(orderItemVo.getSkuId())).findFirst().orElse(null);
         if(null == goodsSkuSqr)

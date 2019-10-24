@@ -101,4 +101,7 @@ public class OrderItemVo {
 
     @ApiModelProperty(value = "是否有关联赠品 1有")
     private Integer isHavePremium;
+
+    @ApiModelProperty(value = "卡类型来源(0-其他 1-华润 2-油卡)", name = "cardType")
+    private String cardType;
 }

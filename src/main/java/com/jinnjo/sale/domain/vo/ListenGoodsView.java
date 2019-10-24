@@ -87,11 +87,13 @@ public class ListenGoodsView {
     @ApiModelProperty(value = "商品规格", name = "skuInfos")
     private List<GoodsSkuSqr> skuInfos;
 
-
     @ApiModelProperty(value = "限时购标识(否:0,是:1)", name = "timeBugFlag")
     private Boolean timeBugFlag;
 
     @ApiModelProperty(value="是否赠品(1:赠品)" , name = "isPremium")
     private String isPremium;
+
+    @ApiModelProperty(value = "卡类型来源(0-其他 1-华润 2-油卡)", name = "cardType")
+    private String cardType;
 
 }

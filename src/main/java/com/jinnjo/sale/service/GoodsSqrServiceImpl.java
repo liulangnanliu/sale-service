@@ -45,6 +45,7 @@ public class GoodsSqrServiceImpl implements GoodsSqrService{
             goodsSqr.setSkuInfos(messageList);//商品规格
             goodsSqr.setStatus(listenGoodsView.getStatus());
             goodsSqr.setIsPremium(listenGoodsView.getIsPremium());
+            goodsSqr.setCardType(listenGoodsView.getCardType());
             goodsSqrRepository.save(goodsSqr);
         }
     }

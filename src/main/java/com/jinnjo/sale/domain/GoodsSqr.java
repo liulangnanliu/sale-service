@@ -79,6 +79,9 @@ public class GoodsSqr  extends BaseEntity{
     @ApiModelProperty(value="是否赠品(1:赠品)" , name = "isPremium")
     private String isPremium;
 
+    @ApiModelProperty(value = "卡类型来源(0-其他 1-华润 2-油卡)", name = "cardType")
+    private String cardType;
+
     @ApiModelProperty(value = "商品规格", name = "skuInfos")
     @NotNull(message = "商品规格信息不能为空！")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
