@@ -15,6 +15,13 @@ env:
     value: zh_CN.UTF-8
   - name: LANGUAGE
     value: zh_CN:zh
+  - name: SW_AGENT_NAMESPACE
+    valueFrom:
+      secretKeyRef:
+        name: common-env
+        key: env.profile
+  - name: SW_AGENT_NAME
+    value: "sale-service"
   - name: SPRING_PROFILES_ACTIVE
     valueFrom:
       secretKeyRef:

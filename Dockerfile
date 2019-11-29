@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-slim
+FROM registry.cn-hangzhou.aliyuncs.com/jzpub/jdk8-skywalking:1.0
 ENV PORT 8080
 ENV CLASSPATH /opt/lib
 EXPOSE 8080
@@ -11,4 +11,4 @@ COPY pom.xml target/lib* /opt/lib/
 # we could do with a better way to know the name - or to always create an app.jar or something
 COPY target/*.jar /opt/app.jar
 WORKDIR /opt
-CMD ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-jar", "app.jar"]
+CMD ["java","-javaagent:/opt/skywalking/agent/skywalking-agent.jar", "-XX:InitialRAMPercentage=50.0", "-XX:MaxRAMPercentage=80.0", "-jar", "app.jar"]
