@@ -46,6 +46,8 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     private final GoodsClient goodsClient;
     private final TimeLimitRemindRepository timeLimitRemindRepository;
 
+    private final static Integer SQR_PLATFORM = 101;
+
     @Autowired
     public TimeLimitBuyAppServiceImpl(CampaignCilent campaignCilent,
                                       GoodsClient goodsClient,
@@ -62,7 +64,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     public MarketingCampaignVo getForTop(String cityCode) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
-        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date);
+        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date, SQR_PLATFORM);
         if (marketingCampaignVoList.size()<=0){
             return null;
         }
@@ -167,7 +169,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     public List<MarketingCampaignVo> getForList(String cityCode) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
-        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date);
+        List<MarketingCampaignVo> marketingCampaignVoList = campaignCilent.getCampaignsByPage(date, SQR_PLATFORM);
         if (marketingCampaignVoList.size()<=0){
             return null;
         }
@@ -202,9 +204,11 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
 
     @Override
     public GoodInfoVo getGoodInfo(Long id){
-        MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
-        if(null == campaignVo)
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
+        if(campaignVos.size() == 0)
             throw new ConstraintViolationException("当前商品没有设置限时购活动!", new HashSet<>());
+
+        MarketingCampaignVo campaignVo = campaignVos.get(0);
 
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
         if(null == seckillGoods){
@@ -271,9 +275,11 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     @Override
     public void remindNotify(Long userId, Long id) {
 
-        MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
-        if(null == campaignVo)
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
+        if(campaignVos.size() == 0)
             return;
+
+        MarketingCampaignVo campaignVo = campaignVos.get(0);
 
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> id.equals(seckillGoodsVo.getGoodsId())).findFirst().orElse(null);
         if(null == seckillGoods)

@@ -58,10 +58,12 @@ public class TimeLimitBuyOrderService {
         //只考虑单商品购买
         OrderItemVo orderItemVo = orderSubmitVo.getVoList().get(0).getOrderItemVOList().get(0);
 
-        MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId());
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId());
 
-        if(null == campaignVo)
+        if(campaignVos.size() == 0)
             return orderClient.orders(orderSubmitVo);
+
+        MarketingCampaignVo campaignVo = campaignVos.get(0);
 
         //校验当前的商品规格是否是限时购商品规格
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> orderItemVo.getGoodsId().equals(seckillGoodsVo.getGoodsId()) && orderItemVo.getSkuId().equals(seckillGoodsVo.getGoodsSpecId()))
@@ -100,10 +102,12 @@ public class TimeLimitBuyOrderService {
         OrderItemVo orderItemVo = orderSubmitVo.getVoList().get(0).getOrderItemVOList().get(0);
 
 
-        MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId());
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId());
 
-        if(null == campaignVo)
+        if(campaignVos.size() == 0)
             return orderClient.getShoppingFee(orderSubmitVo, 0);
+
+        MarketingCampaignVo campaignVo = campaignVos.get(0);
 
         //校验当前的商品规格是否是限时购商品规格
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> orderItemVo.getGoodsId().equals(seckillGoodsVo.getGoodsId()) && orderItemVo.getSkuId().equals(seckillGoodsVo.getGoodsSpecId()))
@@ -128,10 +132,12 @@ public class TimeLimitBuyOrderService {
         if(count > goodsSkuSqr.getStock())
             throw new ConstraintViolationException("库存不足", new HashSet<>());
 
-        MarketingCampaignVo campaignVo = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), goodsId);
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), goodsId);
 
-        if(null == campaignVo)
+        if(campaignVos.size() == 0)
            throw new ConstraintViolationException("该商品没有参与限时购活动!", new HashSet<>());
+
+        MarketingCampaignVo campaignVo = campaignVos.get(0);
 
         //校验当前的商品规格是否是限时购商品规格
         SeckillGoodsVo seckillGoods = campaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(seckillGoodsVo -> goodsId.equals(seckillGoodsVo.getGoodsId()) && skuId.equals(seckillGoodsVo.getGoodsSpecId()))

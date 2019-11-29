@@ -35,6 +35,8 @@ public class TimeLimitBuyService {
     private final SaleProducer saleProducer;
     private final GoodsSqrRepository goodsSqrRepository;
 
+    private final static Integer SQR_PLATFORM = 101;
+
     @Autowired
     public TimeLimitBuyService(CampaignCilent campaignCilent,
                                GoodsClient goodsClient,
@@ -60,14 +62,14 @@ public class TimeLimitBuyService {
             throw new ConstraintViolationException("新增的限时购活动开始时间不能大于结束时间!", new HashSet<>());
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(endSeckillTime), null);
+        Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(endSeckillTime), null, marketingCampaignVo.getApplyPlatform());
         if(timeFlag > 0)
             throw new ConstraintViolationException("新增的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
 
         LocalDate seckillTime = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
 
         String goodsIds = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().map(seckillGoodsVo -> String.valueOf(seckillGoodsVo.getGoodsId())).collect(Collectors.joining(","));
-        List<String> seckillGoodsList = campaignCilent.checkSeckillGoodsList(seckillTime.toString(), goodsIds);
+        List<String> seckillGoodsList = campaignCilent.checkSeckillGoodsList(seckillTime.toString(), goodsIds, marketingCampaignVo.getApplyPlatform());
         if(seckillGoodsList.size() > 0)
             throw new ConstraintViolationException("新增的限时购活动商品"+seckillGoodsList.stream().collect(Collectors.joining(","))+"已存在!", new HashSet<>());
 
@@ -157,7 +159,7 @@ public class TimeLimitBuyService {
             //校验活动时间
             if(!target.getDiscountSeckillInfo().getStartSeckillTime().equals(startSeckillTime)
                     || !target.getDiscountSeckillInfo().getEndSeckillTime().equals(endSeckillTime)){
-                Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(endSeckillTime), marketingCampaignVo.getId());
+                Long timeFlag = campaignCilent.checkSeckillTime(sdf.format(startSeckillTime), sdf.format(endSeckillTime), marketingCampaignVo.getId(), marketingCampaignVo.getApplyPlatform());
                 if(timeFlag > 0)
                     throw new ConstraintViolationException("修改的限时购活动时间已经存在或者存在重复时间段!", new HashSet<>());
             }
@@ -170,7 +172,7 @@ public class TimeLimitBuyService {
         String newGoodsIds = marketingCampaignVo.getDiscountSeckillInfo().getSeckillGoodsList().stream().filter(t -> !targetGoodsIds.contains(t.getGoodsId())).map(seckillGoodsVo -> String.valueOf(seckillGoodsVo.getGoodsId())).collect(Collectors.joining(","));
         if(StringUtil.isNotEmpty(newGoodsIds)){
             LocalDate seckillTime = LocalDateTime.ofInstant(startSeckillTime.toInstant(), ZoneId.systemDefault()).toLocalDate();
-            List<String> seckillGoodsList = campaignCilent.checkSeckillGoodsList(seckillTime.toString(), newGoodsIds);
+            List<String> seckillGoodsList = campaignCilent.checkSeckillGoodsList(seckillTime.toString(), newGoodsIds, target.getApplyPlatform());
             if(seckillGoodsList.size() > 0)
                 throw new ConstraintViolationException("修改的限时购活动商品"+seckillGoodsList.stream().collect(Collectors.joining(","))+"已存在!", new HashSet<>());
         }
@@ -237,7 +239,7 @@ public class TimeLimitBuyService {
     }
 
     public Page<MarketingCampaignVo> getTimeLimitBuy(Integer page, Integer size , String startSeckillTime , String endSeckillTime, Integer status){
-        PageVo<MarketingCampaignVo> pageVo = campaignCilent.getSeckillByPage(startSeckillTime , endSeckillTime, page, size , status);
+        PageVo<MarketingCampaignVo> pageVo = campaignCilent.getSeckillByPage(startSeckillTime , endSeckillTime, page, size , status, SQR_PLATFORM);
 
         List<MarketingCampaignVo> content = pageVo.getContent().stream().map(marketingCampaignVo -> {
             long time = new Date().getTime();
@@ -254,12 +256,12 @@ public class TimeLimitBuyService {
     }
 
     public Long checkSeckillGoods(String date, Long goodsId, Long goodsSpecId){
-        return campaignCilent.checkSeckillGoods(date, goodsId, goodsSpecId);
+        return campaignCilent.checkSeckillGoods(date, goodsId, goodsSpecId, SQR_PLATFORM);
     }
 
     public void executeJob() throws JobExecutionException{
 
-        List<MarketingCampaignVo> campaignsByPages = campaignCilent.getCampaignsByPage(LocalDate.now().toString());
+        List<MarketingCampaignVo> campaignsByPages = campaignCilent.getCampaignsByPage(LocalDate.now().toString(), SQR_PLATFORM);
 
         List<Long> goodIds = campaignsByPages.stream().map(marketingCampaignVo -> marketingCampaignVo.getDiscountSeckillInfo()).flatMap(discountSeckillInfoVo -> discountSeckillInfoVo.getSeckillGoodsList().stream()).map(seckillGoodsVo -> seckillGoodsVo.getGoodsId()).collect(Collectors.toList());
 
@@ -300,7 +302,7 @@ public class TimeLimitBuyService {
     }
 
     public void executeSaleEndJob(String startSeckillTime, String endSeckillTime){
-        List<SeckillGoodsVo> seckillGoods = campaignCilent.getGoodsListBySeckTime(startSeckillTime, endSeckillTime);
+        List<SeckillGoodsVo> seckillGoods = campaignCilent.getGoodsListBySeckTime(startSeckillTime, endSeckillTime, SQR_PLATFORM);
         //将所有商品的限时购标识取消
         if(null != seckillGoods && seckillGoods.size() > 0)
             saleProducer.produceSend(seckillGoods.stream().map(seckillGoodsVo -> new GoodsMessage(seckillGoodsVo.getGoodsId(), false)).collect(Collectors.toList()), "goods.update");

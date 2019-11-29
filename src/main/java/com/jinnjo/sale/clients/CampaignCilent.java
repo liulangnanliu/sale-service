@@ -19,7 +19,7 @@ public interface CampaignCilent {
     String addCampaigns(@RequestBody MarketingCampaignVo marketingCampaignVo);
 
     @GetMapping(value = "/campaigns/seckills", headers = {FeignSecurityBean.SECURITY_AUTH_USER_OR_SERVICE})
-    List<MarketingCampaignVo> getCampaignsByPage(@RequestParam("date") String date);
+    List<MarketingCampaignVo> getCampaignsByPage(@RequestParam("date") String date, @RequestParam("applyPlatform") Integer applyPlatform);
 
     @GetMapping(value = "/campaigns/{id}", headers = {FeignSecurityBean.SECURITY_AUTH_USER_OR_SERVICE})
     MarketingCampaignVo getCampaignById(@PathVariable("id") Long id);
@@ -37,21 +37,21 @@ public interface CampaignCilent {
     void changeStatus(@PathVariable("id") Long id, @RequestParam("status") Integer status);
 
     @GetMapping(value = "/campaigns/seckillgoodsbytime", headers = {FeignSecurityBean.SECURITY_AUTH_USER_OR_SERVICE})
-    List<SeckillGoodsVo> getGoodsListBySeckTime(@RequestParam("startSeckillTime")String startSeckillTime,@RequestParam("endSeckillTime")String endSeckillTime);
+    List<SeckillGoodsVo> getGoodsListBySeckTime(@RequestParam("startSeckillTime") String startSeckillTime, @RequestParam("endSeckillTime") String endSeckillTime, @RequestParam("applyPlatform") Integer applyPlatform);
 
     @GetMapping(value = "/campaigns/seckill/page", headers = {FeignSecurityBean.SECURITY_AUTH_USER_OR_SERVICE})
-    PageVo<MarketingCampaignVo> getSeckillByPage(@RequestParam("startSeckillTime")String startSeckillTime, @RequestParam("endSeckillTime")String endSeckillTime, @RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("status") Integer status);
+    PageVo<MarketingCampaignVo> getSeckillByPage(@RequestParam("startSeckillTime") String startSeckillTime, @RequestParam("endSeckillTime") String endSeckillTime, @RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("status") Integer status, @RequestParam("applyPlatform") Integer applyPlatform);
 
     @GetMapping(value = "/campaigns/goodsid", headers = {FeignSecurityBean.SECURITY_AUTH_USER_OR_SERVICE})
-    MarketingCampaignVo getCampaignsByGoodsId(@RequestParam("date") String date, @RequestParam("goodsId") Long goodsId);
+    List<MarketingCampaignVo> getCampaignsByGoodsId(@RequestParam("date") String date, @RequestParam("goodsId") Long goodsId);
 
     @GetMapping(value = "/campaigns/checkseckillgoods", headers = {FeignSecurityBean.SECURITY_AUTH_USER_OR_SERVICE})
-    Long checkSeckillGoods(@RequestParam("date") String date, @RequestParam("goodsId") Long goodsId, @RequestParam("goodsSpecId") Long goodsSpecId);
+    Long checkSeckillGoods(@RequestParam("date") String date, @RequestParam("goodsId") Long goodsId, @RequestParam("goodsSpecId") Long goodsSpecId, @RequestParam("applyPlatform") Integer applyPlatform);
 
     @PostMapping(value = "/campaigns/checkseckilltime", headers = {FeignSecurityBean.SECURITY_AUTH_USER_OR_SERVICE})
-    Long checkSeckillTime(@RequestParam("startSeckillTime") String startSeckillTime, @RequestParam("endSeckillTime") String endSeckillTime, @RequestParam("id") String id);
+    Long checkSeckillTime(@RequestParam("startSeckillTime") String startSeckillTime, @RequestParam("endSeckillTime") String endSeckillTime, @RequestParam("id") String id, @RequestParam("applyPlatform") Integer applyPlatform);
 
     @GetMapping(value = "/campaigns/checkseckillgoodslist", headers = {FeignSecurityBean.SECURITY_AUTH_USER_OR_SERVICE})
-    List<String> checkSeckillGoodsList(@RequestParam("date") String date, @RequestParam("goodsList") String goodsList);
+    List<String> checkSeckillGoodsList(@RequestParam("date") String date, @RequestParam("goodsList") String goodsList, @RequestParam("applyPlatform") Integer applyPlatform);
 
 }

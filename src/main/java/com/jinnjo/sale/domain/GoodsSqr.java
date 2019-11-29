@@ -14,7 +14,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity(name = "GoodsSqr")
 @Table(name = "jz_goods_info_sqr")
-public class GoodsSqr  extends BaseEntity{
+public class GoodsSqr extends BaseEntity{
     @NotNull(message = "商品名称不能为空")
     @ApiModelProperty(value = "商品名称", name = "title")
     private String title;
