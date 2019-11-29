@@ -41,6 +41,8 @@ public class TimeLimitBuyOrderService {
 
     private final StringRedisTemplate stringRedisTemplate17;
 
+    private final static Integer SQR_PLATFORM = 101;
+
     @Autowired
     public TimeLimitBuyOrderService(CampaignCilent campaignCilent,
                                     OrderClient orderClient,
@@ -58,7 +60,7 @@ public class TimeLimitBuyOrderService {
         //只考虑单商品购买
         OrderItemVo orderItemVo = orderSubmitVo.getVoList().get(0).getOrderItemVOList().get(0);
 
-        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId());
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId(), SQR_PLATFORM);
 
         if(campaignVos.size() == 0)
             return orderClient.orders(orderSubmitVo);
@@ -102,7 +104,7 @@ public class TimeLimitBuyOrderService {
         OrderItemVo orderItemVo = orderSubmitVo.getVoList().get(0).getOrderItemVOList().get(0);
 
 
-        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId());
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), orderItemVo.getGoodsId(), SQR_PLATFORM);
 
         if(campaignVos.size() == 0)
             return orderClient.getShoppingFee(orderSubmitVo, 0);
@@ -132,7 +134,7 @@ public class TimeLimitBuyOrderService {
         if(count > goodsSkuSqr.getStock())
             throw new ConstraintViolationException("库存不足", new HashSet<>());
 
-        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), goodsId);
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), goodsId, SQR_PLATFORM);
 
         if(campaignVos.size() == 0)
            throw new ConstraintViolationException("该商品没有参与限时购活动!", new HashSet<>());

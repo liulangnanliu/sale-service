@@ -204,7 +204,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
 
     @Override
     public GoodInfoVo getGoodInfo(Long id){
-        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id, SQR_PLATFORM);
         if(campaignVos.size() == 0)
             throw new ConstraintViolationException("当前商品没有设置限时购活动!", new HashSet<>());
 
@@ -275,7 +275,7 @@ public class TimeLimitBuyAppServiceImpl implements TimeLimitBuyAppService{
     @Override
     public void remindNotify(Long userId, Long id) {
 
-        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id);
+        List<MarketingCampaignVo> campaignVos = campaignCilent.getCampaignsByGoodsId(LocalDate.now().toString(), id, SQR_PLATFORM);
         if(campaignVos.size() == 0)
             return;
 
