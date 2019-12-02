@@ -22,7 +22,7 @@ public class MarketingCampaignVo {
     private String name;
 
     @ApiModelProperty(value = "营销创建开始时间")
-    @JsonFormat(timezone = "GMT+08:00")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
 
     @ApiModelProperty(value = "营销活动开始时间")
